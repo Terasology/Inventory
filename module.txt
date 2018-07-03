@@ -1,0 +1,9 @@
+{
+    "id" : "Inventory",
+    "version" : "0.1.0-SNAPSHOT",
+    "author" : "",
+    "displayName" : "Inventory",
+    "description" : "",
+    "dependencies" : [],
+    "serverSideOnly" : false
+}
