@@ -80,7 +80,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
     public void ensureTransferSlotIsCreated(OnAddedComponent event, EntityRef entityRef, CharacterComponent characterComponent) {
-        EntityRef transferSlot = entityManager.create("core:transferSlot");
+        EntityRef transferSlot = entityManager.create("Inventory:transferSlot");
         characterComponent.movingItem = transferSlot;
         entityRef.saveComponent(characterComponent);
     }
@@ -170,7 +170,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
         //resize the crosshair
 
-        InventoryHud toolbar = nuiManager.getHUD().getHUDElement("core:InventoryHud", InventoryHud.class);
+        InventoryHud toolbar = nuiManager.getHUD().getHUDElement("Inventory:InventoryHud", InventoryHud.class);
         if (toolbar != null) {
             toolbar.setChargeAmount(getDropPower());
         }
@@ -211,7 +211,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     }
 
     public void resetDropMark() {
-        InventoryHud toolbar = nuiManager.getHUD().getHUDElement("core:InventoryHud", InventoryHud.class);
+        InventoryHud toolbar = nuiManager.getHUD().getHUDElement("Inventory:InventoryHud", InventoryHud.class);
         if (toolbar != null) {
             toolbar.setChargeAmount(0);
         }

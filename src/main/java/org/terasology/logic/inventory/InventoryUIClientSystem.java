@@ -39,13 +39,13 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("inventoryHud");
-        nuiManager.addOverlay("core:transferItemCursor", ControlWidget.class);
+        nuiManager.addOverlay("Inventory:transferItemCursor", ControlWidget.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            nuiManager.toggleScreen("core:inventoryScreen");
+            nuiManager.toggleScreen("Inventory:inventoryScreen");
             event.consume();
         }
     }

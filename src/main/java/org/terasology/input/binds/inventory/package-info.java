@@ -18,20 +18,20 @@
 @InputCategory(id = "inventory",
         displayName = "Inventory",
         ordering = {
-                "core:dropItem",
-                "core:inventory",
-                "core:toolbarPrev",
-                "core:toolbarNext",
-                "core:toolbarSlot0",
-                "core:toolbarSlot1",
-                "core:toolbarSlot2",
-                "core:toolbarSlot3",
-                "core:toolbarSlot4",
-                "core:toolbarSlot5",
-                "core:toolbarSlot6",
-                "core:toolbarSlot7",
-                "core:toolbarSlot8",
-                "core:toolbarSlot9"
+                "Inventory:dropItem",
+                "Inventory:inventory",
+                "Inventory:toolbarPrev",
+                "Inventory:toolbarNext",
+                "Inventory:toolbarSlot0",
+                "Inventory:toolbarSlot1",
+                "Inventory:toolbarSlot2",
+                "Inventory:toolbarSlot3",
+                "Inventory:toolbarSlot4",
+                "Inventory:toolbarSlot5",
+                "Inventory:toolbarSlot6",
+                "Inventory:toolbarSlot7",
+                "Inventory:toolbarSlot8",
+                "Inventory:toolbarSlot9"
         }) package org.terasology.input.binds.inventory;
 
 import org.terasology.input.InputCategory;
