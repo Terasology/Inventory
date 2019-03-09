@@ -16,7 +16,7 @@
 
 
 @InputCategory(id = "inventory",
-        displayName = "Inventory",
+        displayName = "${engine:menu#category-inventory}",
         ordering = {
                 "Inventory:dropItem",
                 "Inventory:inventory",
