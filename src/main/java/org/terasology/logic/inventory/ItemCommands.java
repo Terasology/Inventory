@@ -105,13 +105,77 @@ public class ItemCommands extends BaseComponentSystem {
             return builder.toString();
         }
 
-        // If no no matches are found for items, try blocks
+        // If no matches are found for items, try blocks
         String message = blockCommands.giveBlock(client, itemPrefabName, amount, shapeUriParam);
         if (message != null) {
             return message;
         }
 
         return "Could not find an item or block matching \"" + itemPrefabName + "\"";
+    }
+
+
+    @Command(shortDescription = "Removes an item from your inventory",
+            helpText = "Removes the desired number of the given item from your inventory",
+            runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String remove(
+            @Sender EntityRef client,
+            @CommandParam("prefabId") String itemPrefabName,
+            @CommandParam(value = "amount", required = false) Integer amount) {
+
+        int itemAmount = amount != null ? amount : 1;
+        if (itemAmount < 1) {
+            return "Invalid amount of items!";
+        }
+
+        Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
+
+        if (matches.size() == 1) {
+            Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
+
+            if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
+                EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+                List<EntityRef> itemsSlots = playerEntity.getComponent(InventoryComponent.class).itemSlots;
+                int removedItems = 0;
+
+                for (EntityRef slot : itemsSlots) {
+                    Prefab currentPrefab = slot.getParentPrefab();
+
+                    if (currentPrefab != null && currentPrefab.equals(prefab) && itemAmount > 0) {
+                        EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                        itemAmount = itemAmount - 1;
+                        if (result == null) {
+                            return "Could not remove "
+                                    + prefab.getName();
+                        }
+                        if (result == EntityRef.NULL) {
+                            removedItems = removedItems + 1;
+                        }
+                    }
+                }
+
+                if (removedItems > 0) {
+                    return "You removed "
+                            + (removedItems > 1 ? removedItems + " items of " : "an item of ")
+                            + prefab.getName();
+                } else {
+                    return "Could not find "
+                            + prefab.getName()
+                            + " in your inventory";
+                }
+            }
+        } else if (matches.size() > 1) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Requested item \"");
+            builder.append(itemPrefabName);
+            builder.append("\": matches ");
+            Joiner.on(" and ").appendTo(builder, matches);
+            builder.append(". Please fully specify one.");
+            return builder.toString();
+        }
+
+        return "Could not find an item matching \"" + itemPrefabName + "\"";
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
