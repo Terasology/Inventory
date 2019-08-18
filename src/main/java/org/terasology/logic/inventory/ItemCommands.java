@@ -33,6 +33,7 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -45,6 +46,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.*;
 
 @RegisterSystem
+@Share(ItemCommands.class)
 public class ItemCommands extends BaseComponentSystem {
 
     @In
