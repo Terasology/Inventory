@@ -33,11 +33,16 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.utilities.Assets;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.entity.BlockCommands;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RegisterSystem
 public class ItemCommands extends BaseComponentSystem {
@@ -57,6 +62,8 @@ public class ItemCommands extends BaseComponentSystem {
     @In
     private PrefabManager prefabManager;
 
+    @In
+    private BlockManager blockManager;
 
     @Command(shortDescription = "Adds an item or block to your inventory",
             helpText = "Puts the desired number of the given item or block with the given shape into your inventory",
@@ -122,7 +129,8 @@ public class ItemCommands extends BaseComponentSystem {
     public String remove(
             @Sender EntityRef client,
             @CommandParam("prefabId") String itemPrefabName,
-            @CommandParam(value = "amount", required = false) Integer amount) {
+            @CommandParam(value = "amount", required = false) Integer amount,
+            @CommandParam(value = "blockShapeName", required = false) String shapeUriParam) {
 
         int itemAmount = amount != null ? amount : 1;
         if (itemAmount < 1) {
@@ -158,7 +166,8 @@ public class ItemCommands extends BaseComponentSystem {
                 if (removedItems > 0) {
                     return "You removed "
                             + (removedItems > 1 ? removedItems + " items of " : "an item of ")
-                            + prefab.getName();
+                            + prefab.getName()
+                            + (shapeUriParam != null ? " (Item can not have a shape)" : "");
                 } else {
                     return "Could not find "
                             + prefab.getName()
@@ -175,7 +184,13 @@ public class ItemCommands extends BaseComponentSystem {
             return builder.toString();
         }
 
-        return "Could not find an item matching \"" + itemPrefabName + "\"";
+        // If no matches are found for items, try blocks
+        String message = removeBlock(client, itemPrefabName, amount, shapeUriParam);
+        if (message != null) {
+            return message;
+        }
+
+        return "Could not find an item or block matching \"" + itemPrefabName + "\"";
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
@@ -232,6 +247,139 @@ public class ItemCommands extends BaseComponentSystem {
                 give(sender, item, quantityParam, null);
             }
         }
+        return result;
+    }
+
+
+    public String removeBlock(
+            @Sender EntityRef sender,
+            @CommandParam("blockName") String uri,
+            @CommandParam(value = "quantity", required = false) Integer quantityParam,
+            @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
+        Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
+
+        BlockFamily blockFamily = null;
+
+        if (matchingUris.size() == 1) {
+            Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
+            if (def.isPresent()) {
+                if (def.get().isFreeform()) {
+                    if (shapeUriParam == null) {
+                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), new ResourceUrn("engine:cube")));
+                    } else {
+                        Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
+                        if (resolvedShapeUris.isEmpty()) {
+                            return "Found block. No shape found for '" + shapeUriParam + "'";
+                        } else if (resolvedShapeUris.size() > 1) {
+                            StringBuilder builder = new StringBuilder();
+                            builder.append("Found block. Non-unique shape name, possible matches: ");
+                            Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
+                            while (shapeUris.hasNext()) {
+                                builder.append(shapeUris.next().toString());
+                                if (shapeUris.hasNext()) {
+                                    builder.append(", ");
+                                }
+                            }
+
+                            return builder.toString();
+                        }
+                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
+                    }
+                } else {
+                    blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn()));
+                }
+            }
+
+            if (blockFamily == null) {
+                //Should never be reached
+                return "Block not found";
+            }
+
+            int quantity = quantityParam != null ? quantityParam : 1;
+
+            return removeBlock(blockFamily, quantity, sender);
+
+        } else if (matchingUris.size() > 1) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Non-unique block name, possible matches: ");
+            Joiner.on(", ").appendTo(builder, matchingUris);
+            return builder.toString();
+        }
+
+        return null;
+    }
+
+    private String removeBlock(BlockFamily blockFamily, int itemAmount, EntityRef client) {
+        boolean isStackable = blockFamily.getArchetypeBlock().isStackable();
+
+        EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+        List<EntityRef> itemsSlots = playerEntity.getComponent(InventoryComponent.class).itemSlots;
+        int removedItems = 0;
+
+        for (EntityRef slot : itemsSlots) {
+            if (!slot.hasComponent(BlockItemComponent.class)) {
+                continue;
+            }
+            BlockFamily currentBlockFamily = slot.getComponent(BlockItemComponent.class).blockFamily;
+
+            if (currentBlockFamily != null && currentBlockFamily.equals(blockFamily) && itemAmount > 0) {
+
+                if (!isStackable) {
+                    EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                    itemAmount = itemAmount - 1;
+                    if (result == null) {
+                        return "Could not remove "
+                                + currentBlockFamily.getDisplayName();
+                    }
+                    if (result == EntityRef.NULL) {
+                        removedItems = removedItems + 1;
+                    }
+                } else {
+                    ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
+                    if (itemComponent != null) {
+                        if (itemComponent.stackCount >= itemAmount) {
+                            EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, itemAmount);
+                            if (result == null) {
+                                return "Could not remove "
+                                        + currentBlockFamily.getDisplayName();
+                            }
+                            if (result == EntityRef.NULL) {
+                                removedItems = removedItems + 1;
+                            }
+                            break;
+                        } else {
+                            EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, itemComponent.stackCount);
+                            if (result == null) {
+                                return "Could not remove "
+                                        + currentBlockFamily.getDisplayName();
+                            }
+                            if (result == EntityRef.NULL) {
+                                removedItems = removedItems + itemComponent.stackCount;
+                            }
+                            itemAmount = itemAmount - itemComponent.stackCount;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (removedItems > 0) {
+            return "You removed "
+                    + (removedItems > 1 ? removedItems + " blocks of " : "a block of ")
+                    + blockFamily.getDisplayName();
+        } else {
+            return "Could not find "
+                    + blockFamily.getDisplayName()
+                    + " in your inventory";
+        }
+    }
+
+    private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
+        List<T> result = Lists.newArrayList();
+        for (T item : items) {
+            result.add(item);
+        }
+        Collections.sort(result);
         return result;
     }
 }
