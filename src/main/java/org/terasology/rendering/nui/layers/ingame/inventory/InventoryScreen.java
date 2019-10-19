@@ -81,7 +81,6 @@ public class InventoryScreen extends CoreScreenLayer {
         return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
-
     @Override
     public void onClosed(){
         /*
