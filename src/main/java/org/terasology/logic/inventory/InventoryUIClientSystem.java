@@ -92,7 +92,6 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         }
     }
 
-
     /*
       The numbersBetween() and getTransferEntity() methods were
       originally in the InventoryCell class. They were copied over
@@ -136,8 +135,6 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
 
         if (movingItemItem != EntityRef.NULL) {
 
-
-
             if (playerInventory == null) {
                 return;
             }
@@ -151,12 +148,10 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
             EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
             InventoryComponent interactionTargetInventory = interactionTarget.getComponent(InventoryComponent.class);
 
-
             EntityRef targetEntity;
             List<Integer> toSlots = new ArrayList<>(totalSlotCount);
-            if (fromEntity.equals(playerEntity)) {
+            if (fromEntity.equals(playerEntity) && interactionTarget.exists() && interactionTargetInventory != null) {
 
-                if (interactionTarget.exists() && interactionTargetInventory != null) {
                     targetEntity = interactionTarget;
                     toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
                 } else {
