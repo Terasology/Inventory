@@ -45,90 +45,123 @@ public class StartingInventorySystem extends BaseComponentSystem {
     @In
     EntityManager entityManager;
 
+    private BlockItemFactory blockFactory;
+
+    @Override
+    public void initialise() {
+        blockFactory = new BlockItemFactory(entityManager);
+    }
+
     @ReceiveEvent(components = {StartingInventoryComponent.class, InventoryComponent.class})
     public void onStartingInventory(OnAddedComponent event, EntityRef entityRef) {
-        BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
-
         StartingInventoryComponent startingInventoryComponent =
                 entityRef.getComponent(StartingInventoryComponent.class);
-        InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
-        logger.info("Adding starting inventory to {}, entity has {}  slots",
-                entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
+        if (!startingInventoryComponent.provided) {
+            InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
+            logger.info("Adding starting inventory to {}, entity has {} slots",
+                    entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
 
-        int addedItems = 0;
-        for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
-            String uri = item.uri;
-
-            logger.info("Adding {} {}", item.quantity, uri);
-            BlockFamily blockFamily = blockManager.getBlockFamily(uri);
-            if (blockFamily != null) {
-                // If the quantity specified exceeds the maxStackSize then nothing will be added, therefore
-                // at most one slot will be used // TODO split into maxStackSize chunks
-                if (hasSpace(inventoryComponent.itemSlots.size(), addedItems, 1)) {
-                    inventoryManager.giveItem(
-                            entityRef, EntityRef.NULL, blockFactory.newInstance(blockFamily, item.quantity));
-                    ++addedItems;
-                } else {
-                    logger.error("Insufficient inventory space to add {} {}", item.quantity, uri);
-                }
-            } else {
-                // todo get stack size from ItemComponent
-                // Find out of the item is stackable
-                Prefab prefab = Assets.getPrefab(item.uri).orElse(null);
-                if (prefab == null) {
-                    logger.error("Failed to find prefab {}", item.uri);
-                    continue;
-                }
-                ItemComponent component = prefab.getComponent(ItemComponent.class);
-                if (component == null) {
-                    logger.error("Failed to find ItemComponent for {}", item.uri);
-                    continue;
-                }
-                logger.info("'{}' {}", component.stackId, component.maxStackSize);
-                if (component.stackId.length() == 0) {
-                    // Item is not stackable, one slot used per item
-                    if (hasSpace(inventoryComponent.itemSlots.size(), addedItems, item.quantity)) {
-                        for (int i = 0; i < item.quantity; ++i) {
-                            inventoryManager.giveItem(entityRef,
-                                    EntityRef.NULL, entityManager.create(uri));
-                            ++addedItems;
-                        }
-                    } else {
-                        logger.error("Insufficient inventory space to add {} {}", item.quantity, uri);
-                    }
-                } else {
-                    // Item stackable, inventory manager will handle stacking, but we still need to know
-                    // how much we have added
-                    int numFullStacks = item.quantity / component.maxStackSize;
-                    int remainder = item.quantity % component.maxStackSize;
-                    logger.info("quantity {}, maxStack {}, full {}, rem {}",
-                            item.quantity, component.maxStackSize, numFullStacks, remainder);
-                    // Add full stacks
-                    for (int i = 0; i < numFullStacks; ++i) {
-                        for (int j = 0; j < component.maxStackSize; ++j) {
-                            inventoryManager.giveItem(entityRef,
-                                    EntityRef.NULL, entityManager.create(uri));
-                        }
-                        // Every full stack is one slot
-                        ++addedItems;
-                    }
-
-                    // Add remainder
-                    for (int i = 0; i < remainder; ++i) {
-                        inventoryManager.giveItem(entityRef,
-                                EntityRef.NULL, entityManager.create(uri));
-                    }
-                    if (remainder > 0) {
-                        ++addedItems;
-                    }
-                    logger.info("Added {} slots total", addedItems);
-                }
-
+            for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
+                addToInventory(entityRef, item, inventoryComponent);
             }
+            startingInventoryComponent.provided = true;
+            entityRef.saveComponent(startingInventoryComponent);
         }
     }
 
-    private boolean hasSpace(int numSlots, int addedSoFar, int toAdd) {
-        return addedSoFar + toAdd <= numSlots;
+    private boolean addToInventory(EntityRef entityRef,
+                                   StartingInventoryComponent.InventoryItem item,
+                                   InventoryComponent inventoryComponent) {
+        String uri = item.uri;
+        int quantity = item.quantity;
+        return addToInventory(entityRef, uri, quantity, inventoryComponent);
+    }
+
+    private boolean addToInventory(EntityRef entityRef,
+                                   String uri,
+                                   int quantity,
+                                   InventoryComponent inventoryComponent) {
+        // Determine if this is a Block or Item
+        logger.info("Adding {} {}", quantity, uri);
+        BlockFamily blockFamily = blockManager.getBlockFamily(uri);
+        boolean success = true;
+        if (blockFamily != null) {
+            // try give blocks
+            success = tryAddBlocks(entityRef, blockFamily, quantity, inventoryComponent);
+        } else {
+            // try give items
+            success = tryAddItems(entityRef, uri, quantity, inventoryComponent);
+        }
+        if (!success) {
+            logger.error("Failed to add {} {}", quantity, uri);
+        }
+        return success;
+    }
+
+    private boolean tryAddBlocks(EntityRef entityRef,
+                                 BlockFamily blockFamily,
+                                 int quantity,
+                                 InventoryComponent inventoryComponent) {
+        long available = availableSlots(inventoryComponent);
+        if (available >= 1) {
+            if (quantity > 99) {
+                logger.warn("Block stack of > 99 found. Currently maximum block stack size is 99. Adding 99");
+            }
+            return inventoryManager.giveItem(
+                    entityRef, EntityRef.NULL, blockFactory.newInstance(blockFamily, Math.min(quantity, 99)));
+        }
+        return false;
+    }
+
+    private boolean tryAddItems(EntityRef entityRef,
+                                String uri,
+                                int quantity,
+                                InventoryComponent inventoryComponent) {
+        long available = availableSlots(inventoryComponent);
+        // Find out of the item is stackable
+        Prefab prefab = Assets.getPrefab(uri).orElse(null);
+        if (prefab == null) {
+            logger.error("Failed to find prefab {}", uri);
+            return false;
+        }
+        ItemComponent component = prefab.getComponent(ItemComponent.class);
+        if (component == null) {
+            logger.error("Failed to find ItemComponent for {}", uri);
+            return false;
+        }
+        if (component.stackId.length() == 0) {
+            // Item is not stackable, one slot used per item
+            if (available >= quantity) {
+                for (int i = 0; i < quantity; ++i) {
+                    inventoryManager.giveItem(entityRef, EntityRef.NULL, entityManager.create(uri));
+                }
+            } else {
+                logger.error("Insufficient inventory space to add {} {}", quantity, uri);
+            }
+        } else {
+            // Item stackable, inventory manager will handle stacking, but we still need to know
+            // how much we have added
+            int numFullStacks = quantity / component.maxStackSize;
+            int remainder = quantity % component.maxStackSize;
+
+            // Add full stacks
+            for (int i = 0; i < numFullStacks; ++i) {
+                for (int j = 0; j < component.maxStackSize; ++j) {
+                    inventoryManager.giveItem(entityRef,
+                            EntityRef.NULL, entityManager.create(uri));
+                }
+            }
+
+            // Add remainder
+            for (int i = 0; i < remainder; ++i) {
+                inventoryManager.giveItem(entityRef,
+                        EntityRef.NULL, entityManager.create(uri));
+            }
+        }
+        return true;
+    }
+
+    private long availableSlots(InventoryComponent inventoryComponent) {
+        return inventoryComponent.itemSlots.stream().filter(ref -> ref.equals(EntityRef.NULL)).count();
     }
 }

@@ -25,6 +25,7 @@ import java.util.List;
 
 public class StartingInventoryComponent implements Component {
 
+    public boolean provided = false;
     public List<InventoryItem> items = new LinkedList<>();
 
     /**
@@ -35,7 +36,6 @@ public class StartingInventoryComponent implements Component {
 
         public String uri;
 
-        public int quantity = 1;
+        public int quantity = 0;
     }
-
 }
