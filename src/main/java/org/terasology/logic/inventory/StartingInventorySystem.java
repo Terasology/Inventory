@@ -19,12 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
@@ -45,7 +45,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
     @In
     EntityManager entityManager;
 
-    private BlockItemFactory blockFactory;
+    BlockItemFactory blockFactory;
 
     @Override
     public void initialise() {
@@ -53,14 +53,15 @@ public class StartingInventorySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = {StartingInventoryComponent.class, InventoryComponent.class})
-    public void onStartingInventory(OnAddedComponent event, EntityRef entityRef) {
+    public void onStartingInventory(OnPlayerSpawnedEvent event, EntityRef entityRef) {
         StartingInventoryComponent startingInventoryComponent =
                 entityRef.getComponent(StartingInventoryComponent.class);
         if (!startingInventoryComponent.provided) {
             InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
-            logger.info("Adding starting inventory to {}, entity has {} slots",
-                    entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
-
+            if (entityRef.getParentPrefab() != null) {
+                logger.info("Adding starting inventory to {}, entity has {} slots",
+                        entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
+            }
             for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
                 addToInventory(entityRef, item, inventoryComponent);
             }
@@ -74,6 +75,15 @@ public class StartingInventorySystem extends BaseComponentSystem {
                                    InventoryComponent inventoryComponent) {
         String uri = item.uri;
         int quantity = item.quantity;
+        if (uri == null) {
+            logger.warn("Improperly specified starting inventory item: Uri is null");
+            return false;
+        }
+        if (quantity <= 0) {
+            logger.warn("Improperly specified starting inventory item: quantity for '{}' less than zero ({})",
+                    uri, quantity);
+            return false;
+        }
         return addToInventory(entityRef, uri, quantity, inventoryComponent);
     }
 

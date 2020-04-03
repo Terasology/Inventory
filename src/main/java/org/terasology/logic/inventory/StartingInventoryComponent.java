@@ -23,6 +23,33 @@ import org.terasology.world.block.Block;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * A class that allows you to specify a player's starting inventory easily.
+ *
+ * <p><strong>Note</strong> it is not possible to specify nested items (e.g. items in a chest). Stackable
+ * <em>items</em> may have a quantity greater than their maxStackSize and they will be split into multiple
+ * stacks as required. However stackable <em>blocks</em> are limited to maximum stacks of 99, any excess
+ * is ignored.</p>
+ *
+ * Example: add a delta for the player.prefab with the following
+ * <pre>
+ * {
+ *   "StartingInventory": {
+ *     "items": [
+ *       { "uri": "core:pickaxe", "quantity": 1 },
+ *       { "uri": "core:axe", "quantity": 1 },
+ *       { "uri": "core:coal", "quantity": 149 },
+ *       { "uri": "core:shovel", "quantity": 1 },
+ *       { "uri": "CoreBlocks:Torch", "quantity": 99 },
+ *       { "uri": "CoreBlocks:Torch", "quantity": 120 },
+ *       { "uri": "core:explodeTool", "quantity": 1 },
+ *       { "uri": "core:railgunTool", "quantity": 1 },
+ *       { "uri": "CoreBlocks:chest", "quantity": 1 }
+ *     ]
+ *   }
+ * }
+ * </pre>
+ */
 public class StartingInventoryComponent implements Component {
 
     public boolean provided = false;
@@ -34,8 +61,14 @@ public class StartingInventoryComponent implements Component {
     @MappedContainer
     public static class InventoryItem {
 
+        /**
+         * A resource uri, may be either a block uri or an item uri.
+         */
         public String uri;
 
+        /**
+         * Must be greater than 0.
+         */
         public int quantity = 0;
     }
 }
