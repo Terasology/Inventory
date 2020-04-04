@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -44,6 +45,9 @@ public class StartingInventorySystem extends BaseComponentSystem {
 
     @In
     EntityManager entityManager;
+
+    @In
+    PrefabManager prefabManager;
 
     BlockItemFactory blockFactory;
 
@@ -129,7 +133,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
                                 InventoryComponent inventoryComponent) {
         long available = availableSlots(inventoryComponent);
         // Find out of the item is stackable
-        Prefab prefab = Assets.getPrefab(uri).orElse(null);
+        Prefab prefab = prefabManager.getPrefab(uri);
         if (prefab == null) {
             logger.error("Failed to find prefab {}", uri);
             return false;
@@ -139,7 +143,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
             logger.error("Failed to find ItemComponent for {}", uri);
             return false;
         }
-        if (component.stackId.length() == 0) {
+        if (component.stackId == null || component.stackId.length() == 0) {
             // Item is not stackable, one slot used per item
             if (available >= quantity) {
                 for (int i = 0; i < quantity; ++i) {
