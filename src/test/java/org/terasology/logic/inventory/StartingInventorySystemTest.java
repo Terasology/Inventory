@@ -26,6 +26,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
+import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
@@ -80,14 +81,6 @@ public class StartingInventorySystemTest {
         startingInventorySystem.prefabManager = prefabManager;
     }
 
-    // test give block
-
-    // test give item
-
-    // test does try add too much
-
-    // test provided not added again
-
     @Test
     public void giveSingleBlock() {
         ItemComponent itemComp = new ItemComponent();
@@ -133,12 +126,101 @@ public class StartingInventorySystemTest {
     }
 
     @Test
+    public void giveBlockAlreadyProvided() {
+        ItemComponent itemComp = new ItemComponent();
+        EntityRef item = mock(EntityRef.class);
+        setupItemRef(item, itemComp, 1, 10, "blockFamilyA", 1L);
+
+        // Setup blockManager to return the correct families
+        BlockFamily blockFamily = new BlockFamilyA();
+        when(blockManager.getBlockFamily("test:blockFamilyA")).thenReturn(blockFamily);
+
+        // Setup the factory to return the right instances
+        when(blockItemFactory.newInstance(blockFamily, 1)).thenReturn(item);
+
+        // Create the starting inventory
+        StartingInventoryComponent component = new StartingInventoryComponent();
+        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = "test:blockFamilyA";
+        inventoryItem.quantity = 1;
+        component.items.add(inventoryItem);
+        component.provided = true;
+        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
+
+        startingInventorySystem.onStartingInventory(null, entityRef);
+
+        // Assert that the block was NOT added
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(0));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+
+        Mockito.verify(item, times(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, times(0)).exists();
+        Mockito.verify(item, times(0)).saveComponent(itemComp);
+        Mockito.verify(entityRef, times(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(entityRef, times(0)).saveComponent(inventoryComp);
+        Mockito.verify(entityRef, times(0)).saveComponent(component);
+        Mockito.verify(entityRef, times(1)).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef, times(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(blockManager, times(0)).getBlockFamily("test:blockFamilyA");
+        Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
+        Mockito.verify(entityRef, times(0)).getParentPrefab();
+        Mockito.verify(entityRef, times(0)).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(entityRef, times(0)).send(any(InventorySlotChangedEvent.class));
+
+        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item);
+    }
+
+    @Test
+    public void giveBlockStack() {
+        ItemComponent itemComp = new ItemComponent();
+        EntityRef item = mock(EntityRef.class);
+        setupItemRef(item, itemComp, 99, 99, "blockFamilyA", 1L);
+
+        // Setup blockManager to return the correct families
+        BlockFamily blockFamily = new BlockFamilyA();
+        when(blockManager.getBlockFamily("test:blockFamilyA")).thenReturn(blockFamily);
+
+        // Setup the factory to return the right instances
+        when(blockItemFactory.newInstance(blockFamily, 99)).thenReturn(item);
+
+        // Create the starting inventory
+        StartingInventoryComponent component = new StartingInventoryComponent();
+        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = "test:blockFamilyA";
+        inventoryItem.quantity = 110;
+        component.items.add(inventoryItem);
+        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
+
+        startingInventorySystem.onStartingInventory(null, entityRef);
+
+        // Assert that the block was added, only once
+        assertEquals(item, inventoryComp.itemSlots.get(0));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(item).saveComponent(itemComp);
+        Mockito.verify(entityRef, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(entityRef).saveComponent(inventoryComp);
+        Mockito.verify(entityRef).saveComponent(component);
+        Mockito.verify(entityRef, atLeast(1)).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
+        Mockito.verify(blockManager, atLeast(1)).getBlockFamily("test:blockFamilyA");
+        Mockito.verify(blockItemFactory, atLeast(1)).newInstance(blockFamily, 99);
+        Mockito.verify(entityRef).getParentPrefab();
+        Mockito.verify(entityRef).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(entityRef).send(any(InventorySlotChangedEvent.class));
+
+        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item);
+    }
+
+    @Test
     public void giveSingleItem() {
         ItemComponent itemComp = new ItemComponent();
         EntityRef item = mock(EntityRef.class);
         setupItemRef(item, itemComp, 1, 10, "itemA", 1L);
 
-        // Setup blockManager to return bull block family
+        // Setup blockManager to return null block family
         BlockFamily blockFamily = new BlockFamilyA();
         when(blockManager.getBlockFamily(anyString())).thenReturn(null);
 
@@ -194,7 +276,7 @@ public class StartingInventorySystemTest {
         setupItemRef(item2, itemComp2, 1, 1, "", 2L);
         logger.debug("item2 {}", item2);
 
-        // Setup blockManager to return bull block family
+        // Setup blockManager to return null block family
         BlockFamily blockFamily = new BlockFamilyA();
         when(blockManager.getBlockFamily(anyString())).thenReturn(null);
 
@@ -245,8 +327,60 @@ public class StartingInventorySystemTest {
     }
 
     @Test
-    public void giveTooManyNonStackableItem() {
+    public void giveStackableItemPlusOverflow() {
         // Create separate entities for equality checking
+        ItemComponent itemComp1 = new ItemComponent();
+        EntityRef item1 = mock(EntityRef.class);
+        setupItemRef(item1, itemComp1, 1, 3, "itemA", 1L);
+        logger.debug("item1 {}", item1);
+
+        // Setup blockManager to return null block family
+        BlockFamily blockFamily = new BlockFamilyA();
+        when(blockManager.getBlockFamily(anyString())).thenReturn(null);
+
+        // Setup to return item prefab
+        Prefab prefab = mock(Prefab.class);
+        when(prefab.getComponent(ItemComponent.class)).thenReturn(itemComp1);
+        String uri = "test:itemA";
+        when(prefabManager.getPrefab(uri)).thenReturn(prefab);
+        when(entityManager.create(uri)).thenReturn(item1);
+
+        // Create the starting inventory
+        StartingInventoryComponent startingInventoryComponent = new StartingInventoryComponent();
+        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = uri;
+        inventoryItem.quantity = 4;
+        startingInventoryComponent.items.add(inventoryItem);
+        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
+
+        startingInventorySystem.onStartingInventory(null, entityRef);
+
+        assertEquals(item1, inventoryComp.itemSlots.get(0));
+        assertEquals(item1, inventoryComp.itemSlots.get(1));
+        assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
+
+        Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item1, atLeast(0)).exists();
+        Mockito.verify(item1, times(5)).saveComponent(itemComp1);
+        Mockito.verify(item1, atLeast(0)).hashCode();
+        Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
+        Mockito.verify(entityRef, times(2)).saveComponent(inventoryComp);
+        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
+        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(blockManager).getBlockFamily(uri);
+        Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
+        Mockito.verify(entityRef).getParentPrefab();
+        Mockito.verify(entityRef, times(2)).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(entityRef, times(2)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(entityRef, times(3)).send(any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(entityManager, times(4)).create(uri);
+
+//        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item1);
+    }
+
+    @Test
+    public void giveTooManyNonStackableItem() {
         ItemComponent itemComp1 = new ItemComponent();
         EntityRef item1 = mock(EntityRef.class);
         setupItemRef(item1, itemComp1, 1, 1, "", 1L);
@@ -302,6 +436,156 @@ public class StartingInventorySystemTest {
         Mockito.verify(entityManager, times(4)).create(uri);
 
         Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item1);
+    }
+
+    @Test
+    public void giveNonStackableItemThenStackable() {
+        // Create separate entities for equality checking
+        ItemComponent itemComp1 = new ItemComponent();
+        EntityRef item1 = mock(EntityRef.class);
+        setupItemRef(item1, itemComp1, 1, 1, "", 1L);
+        logger.debug("item1 {}", item1);
+        Prefab prefab1 = mock(Prefab.class);
+        when(prefab1.getComponent(ItemComponent.class)).thenReturn(itemComp1);
+        String uri1 = "test:itemA";
+        when(prefabManager.getPrefab(uri1)).thenReturn(prefab1);
+        when(entityManager.create(uri1)).thenReturn(item1);
+
+        ItemComponent itemComp2 = new ItemComponent();
+        EntityRef item2 = mock(EntityRef.class);
+        setupItemRef(item2, itemComp2, 2, 5, "itemB", 2L);
+        logger.debug("item2 {}", item2);
+        Prefab prefab2 = mock(Prefab.class);
+        when(prefab2.getComponent(ItemComponent.class)).thenReturn(itemComp2);
+        String uri2 = "test:itemB";
+        when(prefabManager.getPrefab(uri2)).thenReturn(prefab2);
+        when(entityManager.create(uri2)).thenReturn(item2);
+
+        // Setup blockManager to return bull block family
+        BlockFamily blockFamily = new BlockFamilyA();
+        when(blockManager.getBlockFamily(anyString())).thenReturn(null);
+
+        // Create the starting inventory
+        // Add 3 items, then try to add 2 more which will succeed
+        StartingInventoryComponent startingInventoryComponent = new StartingInventoryComponent();
+        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = uri1;
+        inventoryItem.quantity = 3;
+        startingInventoryComponent.items.add(inventoryItem);
+        inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = uri2;
+        inventoryItem.quantity = 2;
+        startingInventoryComponent.items.add(inventoryItem);
+        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
+
+        startingInventorySystem.onStartingInventory(null, entityRef);
+
+        // Assert that the 3 items from the first InventoryItem were added,
+        // and the 2 from the second were added in 1 stack
+        assertEquals(item1, inventoryComp.itemSlots.get(0));
+        assertEquals(item1, inventoryComp.itemSlots.get(1));
+        assertEquals(item1, inventoryComp.itemSlots.get(2));
+        assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
+        assertEquals(item2, inventoryComp.itemSlots.get(3));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(4));
+
+        Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item1, atLeast(0)).exists();
+        Mockito.verify(item1, times(3)).saveComponent(itemComp1);
+        Mockito.verify(item1, atLeast(0)).hashCode();
+        Mockito.verify(item2, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, atLeast(0)).exists();
+        Mockito.verify(item2, times(2)).saveComponent(itemComp2);
+        Mockito.verify(item2, atLeast(0)).hashCode();
+        Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
+        Mockito.verify(entityRef, times(4)).saveComponent(inventoryComp);
+        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
+        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(blockManager).getBlockFamily(uri1);
+        Mockito.verify(blockManager).getBlockFamily(uri2);
+        Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
+        Mockito.verify(entityRef).getParentPrefab();
+        Mockito.verify(entityRef, times(4)).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(entityRef, times(4)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(entityRef, times(1)).send(any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(entityManager, times(3)).create(uri1);
+        Mockito.verify(entityManager, times(2)).create(uri2);
+
+//        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item1, item2);
+
+    }
+
+    @Test
+    public void giveNonStackableItemThenStackableNoPrefab() {
+        // Create separate entities for equality checking
+        ItemComponent itemComp1 = new ItemComponent();
+        EntityRef item1 = mock(EntityRef.class);
+        setupItemRef(item1, itemComp1, 1, 1, "", 1L);
+        logger.debug("item1 {}", item1);
+
+        ItemComponent itemComp2 = new ItemComponent();
+        EntityRef item2 = mock(EntityRef.class);
+        setupItemRef(item2, itemComp2, 2, 5, "itemB", 2L);
+        logger.debug("item2 {}", item2);
+
+        // Setup blockManager to return bull block family
+        BlockFamily blockFamily = new BlockFamilyA();
+        when(blockManager.getBlockFamily(anyString())).thenReturn(null);
+
+        // Setup to return item prefab
+        Prefab prefab = mock(Prefab.class);
+        when(prefab.getComponent(ItemComponent.class)).thenReturn(itemComp1);
+        String uri = "test:itemA";
+        when(prefabManager.getPrefab(uri)).thenReturn(prefab);
+        when(entityManager.create(uri)).thenReturn(item1);
+        when(entityManager.create("test:itemB")).thenReturn(item2);
+
+        // Create the starting inventory
+        // Add 3 items, then try to add 2 more which will succeed
+        StartingInventoryComponent startingInventoryComponent = new StartingInventoryComponent();
+        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = uri;
+        inventoryItem.quantity = 3;
+        startingInventoryComponent.items.add(inventoryItem);
+        inventoryItem = new StartingInventoryComponent.InventoryItem();
+        inventoryItem.uri = "test:itemB";
+        inventoryItem.quantity = 2;
+        startingInventoryComponent.items.add(inventoryItem);
+        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
+
+        startingInventorySystem.onStartingInventory(null, entityRef);
+
+        // Assert that the 3 items from the first InventoryItem were added,
+        // and the 2 from the second weren't because it can't find a prefab
+        assertEquals(item1, inventoryComp.itemSlots.get(0));
+        assertEquals(item1, inventoryComp.itemSlots.get(1));
+        assertEquals(item1, inventoryComp.itemSlots.get(2));
+        assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(3));
+        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(4));
+
+        Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item1, atLeast(0)).exists();
+        Mockito.verify(item1, times(3)).saveComponent(itemComp1);
+        Mockito.verify(item1, atLeast(0)).hashCode();
+        Mockito.verify(item2, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, atLeast(0)).exists();
+        Mockito.verify(item2, times(0)).saveComponent(itemComp2);
+        Mockito.verify(item2, atLeast(0)).hashCode();
+        Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
+        Mockito.verify(entityRef, times(3)).saveComponent(inventoryComp);
+        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
+        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(blockManager).getBlockFamily("test:itemA");
+        Mockito.verify(blockManager).getBlockFamily("test:itemB");
+        Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
+        Mockito.verify(entityRef).getParentPrefab();
+        Mockito.verify(entityRef, times(3)).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(entityRef, times(3)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(entityManager, times(3)).create(uri);
+        Mockito.verify(entityManager, times(0)).create("test:itemB");
+
+        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item1, item2);
     }
 
     //=======================================================================================
