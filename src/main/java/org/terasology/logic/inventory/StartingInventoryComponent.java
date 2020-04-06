@@ -52,7 +52,6 @@ import java.util.List;
  */
 public class StartingInventoryComponent implements Component {
 
-    public boolean provided = false;
     public List<InventoryItem> items = new LinkedList<>();
 
     /**

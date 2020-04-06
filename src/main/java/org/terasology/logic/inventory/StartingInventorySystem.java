@@ -27,7 +27,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.registry.In;
-import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
@@ -56,22 +55,19 @@ public class StartingInventorySystem extends BaseComponentSystem {
         blockFactory = new BlockItemFactory(entityManager);
     }
 
-    @ReceiveEvent(components = {StartingInventoryComponent.class, InventoryComponent.class})
-    public void onStartingInventory(OnPlayerSpawnedEvent event, EntityRef entityRef) {
-        StartingInventoryComponent startingInventoryComponent =
-                entityRef.getComponent(StartingInventoryComponent.class);
-        if (!startingInventoryComponent.provided) {
-            InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
-            if (entityRef.getParentPrefab() != null) {
-                logger.info("Adding starting inventory to {}, entity has {} slots",
-                        entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
-            }
-            for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
-                addToInventory(entityRef, item, inventoryComponent);
-            }
-            startingInventoryComponent.provided = true;
-            entityRef.saveComponent(startingInventoryComponent);
+    @ReceiveEvent(components = {InventoryComponent.class})
+    public void onStartingInventory(OnPlayerSpawnedEvent event,
+                                    EntityRef entityRef,
+                                    StartingInventoryComponent startingInventoryComponent) {
+        InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
+        if (entityRef.getParentPrefab() != null) {
+            logger.info("Adding starting inventory to {}, entity has {} slots",
+                    entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
         }
+        for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
+            addToInventory(entityRef, item, inventoryComponent);
+        }
+        entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
     private boolean addToInventory(EntityRef entityRef,

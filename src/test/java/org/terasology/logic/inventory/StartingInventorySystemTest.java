@@ -38,6 +38,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -100,72 +101,27 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = "test:blockFamilyA";
         inventoryItem.quantity = 1;
         component.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, component);
 
         // Assert that the block was added, only once
         assertEquals(item, inventoryComp.itemSlots.get(0));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item, atLeast(0)).exists();
         Mockito.verify(item).saveComponent(itemComp);
         Mockito.verify(entityRef, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(component);
-        Mockito.verify(entityRef, atLeast(1)).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(blockManager, atLeast(1)).getBlockFamily("test:blockFamilyA");
         Mockito.verify(blockItemFactory, atLeast(1)).newInstance(blockFamily, 1);
         Mockito.verify(entityRef).getParentPrefab();
         Mockito.verify(entityRef).send(any(BeforeItemPutInInventory.class));
         Mockito.verify(entityRef).send(any(InventorySlotChangedEvent.class));
-
-        Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item);
-    }
-
-    @Test
-    public void giveBlockAlreadyProvided() {
-        ItemComponent itemComp = new ItemComponent();
-        EntityRef item = mock(EntityRef.class);
-        setupItemRef(item, itemComp, 1, 10, "blockFamilyA", 1L);
-
-        // Setup blockManager to return the correct families
-        BlockFamily blockFamily = new BlockFamilyA();
-        when(blockManager.getBlockFamily("test:blockFamilyA")).thenReturn(blockFamily);
-
-        // Setup the factory to return the right instances
-        when(blockItemFactory.newInstance(blockFamily, 1)).thenReturn(item);
-
-        // Create the starting inventory
-        StartingInventoryComponent component = new StartingInventoryComponent();
-        StartingInventoryComponent.InventoryItem inventoryItem = new StartingInventoryComponent.InventoryItem();
-        inventoryItem.uri = "test:blockFamilyA";
-        inventoryItem.quantity = 1;
-        component.items.add(inventoryItem);
-        component.provided = true;
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
-
-        startingInventorySystem.onStartingInventory(null, entityRef);
-
-        // Assert that the block was NOT added
-        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(0));
-        assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
-
-        Mockito.verify(item, times(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, times(0)).exists();
-        Mockito.verify(item, times(0)).saveComponent(itemComp);
-        Mockito.verify(entityRef, times(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(entityRef, times(0)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef, times(0)).saveComponent(component);
-        Mockito.verify(entityRef, times(1)).getComponent(StartingInventoryComponent.class);
-        Mockito.verify(entityRef, times(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(blockManager, times(0)).getBlockFamily("test:blockFamilyA");
-        Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
-        Mockito.verify(entityRef, times(0)).getParentPrefab();
-        Mockito.verify(entityRef, times(0)).send(any(BeforeItemPutInInventory.class));
-        Mockito.verify(entityRef, times(0)).send(any(InventorySlotChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(entityRef, entityManager, blockManager, blockItemFactory, item);
     }
@@ -189,21 +145,21 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = "test:blockFamilyA";
         inventoryItem.quantity = 110;
         component.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, component);
 
         // Assert that the block was added, only once
         assertEquals(item, inventoryComp.itemSlots.get(0));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item, atLeast(0)).exists();
         Mockito.verify(item).saveComponent(itemComp);
         Mockito.verify(entityRef, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(component);
-        Mockito.verify(entityRef, atLeast(1)).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(blockManager, atLeast(1)).getBlockFamily("test:blockFamilyA");
         Mockito.verify(blockItemFactory, atLeast(1)).newInstance(blockFamily, 99);
@@ -237,21 +193,21 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = uri;
         inventoryItem.quantity = 1;
         component.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(component);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, component);
 
         // Assert that the item was added, only once
         assertEquals(item, inventoryComp.itemSlots.get(0));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item, atLeast(0)).exists();
         Mockito.verify(item).saveComponent(itemComp);
         Mockito.verify(entityRef, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(component);
-        Mockito.verify(entityRef, atLeast(1)).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(blockManager, atLeast(1)).getBlockFamily("test:itemA");
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
@@ -293,9 +249,8 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = uri;
         inventoryItem.quantity = 3;
         startingInventoryComponent.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, startingInventoryComponent);
 
         assertNotEquals(item1, item2);
         assertEquals(item1, inventoryComp.itemSlots.get(0));
@@ -303,6 +258,7 @@ public class StartingInventorySystemTest {
         assertEquals(item2, inventoryComp.itemSlots.get(2));
         assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(3));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, atLeast(0)).exists();
@@ -314,8 +270,8 @@ public class StartingInventorySystemTest {
         Mockito.verify(item2, atLeast(0)).hashCode();
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef, times(3)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
-        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(blockManager).getBlockFamily("test:itemA");
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
         Mockito.verify(entityRef).getParentPrefab();
@@ -351,14 +307,14 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = uri;
         inventoryItem.quantity = 4;
         startingInventoryComponent.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, startingInventoryComponent);
 
         assertEquals(item1, inventoryComp.itemSlots.get(0));
         assertEquals(item1, inventoryComp.itemSlots.get(1));
         assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(1));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, atLeast(0)).exists();
@@ -366,8 +322,8 @@ public class StartingInventorySystemTest {
         Mockito.verify(item1, atLeast(0)).hashCode();
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef, times(2)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
-        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(blockManager).getBlockFamily(uri);
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
         Mockito.verify(entityRef).getParentPrefab();
@@ -408,9 +364,8 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = uri;
         inventoryItem.quantity = 2;
         startingInventoryComponent.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, startingInventoryComponent);
 
         // Assert that the 4 items from the first InventoryItem were added, and the 2 from the second weren't
         assertEquals(item1, inventoryComp.itemSlots.get(0));
@@ -419,6 +374,7 @@ public class StartingInventorySystemTest {
         assertEquals(item1, inventoryComp.itemSlots.get(3));
         assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(3));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(4));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, atLeast(0)).exists();
@@ -426,8 +382,8 @@ public class StartingInventorySystemTest {
         Mockito.verify(item1, atLeast(0)).hashCode();
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef, times(4)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
-        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(blockManager, times(2)).getBlockFamily("test:itemA");
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
         Mockito.verify(entityRef).getParentPrefab();
@@ -476,9 +432,8 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = uri2;
         inventoryItem.quantity = 2;
         startingInventoryComponent.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, startingInventoryComponent);
 
         // Assert that the 3 items from the first InventoryItem were added,
         // and the 2 from the second were added in 1 stack
@@ -488,6 +443,7 @@ public class StartingInventorySystemTest {
         assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
         assertEquals(item2, inventoryComp.itemSlots.get(3));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(4));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, atLeast(0)).exists();
@@ -499,8 +455,8 @@ public class StartingInventorySystemTest {
         Mockito.verify(item2, atLeast(0)).hashCode();
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef, times(4)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
-        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(blockManager).getBlockFamily(uri1);
         Mockito.verify(blockManager).getBlockFamily(uri2);
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
@@ -551,9 +507,8 @@ public class StartingInventorySystemTest {
         inventoryItem.uri = "test:itemB";
         inventoryItem.quantity = 2;
         startingInventoryComponent.items.add(inventoryItem);
-        when(entityRef.getComponent(StartingInventoryComponent.class)).thenReturn(startingInventoryComponent);
 
-        startingInventorySystem.onStartingInventory(null, entityRef);
+        startingInventorySystem.onStartingInventory(null, entityRef, startingInventoryComponent);
 
         // Assert that the 3 items from the first InventoryItem were added,
         // and the 2 from the second weren't because it can't find a prefab
@@ -563,6 +518,7 @@ public class StartingInventorySystemTest {
         assertNotEquals(EntityRef.NULL, inventoryComp.itemSlots.get(2));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(3));
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(4));
+        assertFalse(entityRef.hasComponent(StartingInventoryComponent.class));
 
         Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, atLeast(0)).exists();
@@ -574,8 +530,8 @@ public class StartingInventorySystemTest {
         Mockito.verify(item2, atLeast(0)).hashCode();
         Mockito.verify(entityRef, atLeast(1)).getComponent(InventoryComponent.class);
         Mockito.verify(entityRef, times(3)).saveComponent(inventoryComp);
-        Mockito.verify(entityRef).saveComponent(startingInventoryComponent);
-        Mockito.verify(entityRef).getComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).removeComponent(StartingInventoryComponent.class);
+        Mockito.verify(entityRef).hasComponent(StartingInventoryComponent.class);
         Mockito.verify(blockManager).getBlockFamily("test:itemA");
         Mockito.verify(blockManager).getBlockFamily("test:itemB");
         Mockito.verify(blockItemFactory, times(0)).newInstance(blockFamily, 1);
