@@ -96,10 +96,8 @@ public class StartingInventorySystem extends BaseComponentSystem {
         BlockFamily blockFamily = blockManager.getBlockFamily(uri);
         boolean success = true;
         if (blockFamily != null) {
-            // try give blocks
             success = tryAddBlocks(entityRef, blockFamily, quantity, inventoryComponent);
         } else {
-            // try give items
             success = tryAddItems(entityRef, uri, quantity, inventoryComponent);
         }
         if (!success) {
