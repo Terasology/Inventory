@@ -18,6 +18,8 @@ package org.terasology.logic.inventory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -43,11 +45,18 @@ import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RegisterSystem
 @Share(ItemCommands.class)
 public class ItemCommands extends BaseComponentSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(ItemCommands.class);
 
     @In
     private BlockCommands blockCommands;
@@ -105,13 +114,7 @@ public class ItemCommands extends BaseComponentSystem {
             }
 
         } else if (matches.size() > 1) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Requested item \"");
-            builder.append(itemPrefabName);
-            builder.append("\": matches ");
-            Joiner.on(" and ").appendTo(builder, matches);
-            builder.append(". Please fully specify one.");
-            return builder.toString();
+            return buildAmbiguousobjectIdString("item", itemPrefabName, matches);
         }
 
         // If no matches are found for items, try blocks
@@ -130,46 +133,39 @@ public class ItemCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String remove(
             @Sender EntityRef client,
-            @CommandParam("prefabId") String itemPrefabName,
-            @CommandParam(value = "amount", required = false) Integer amount,
+            @CommandParam("prefabId") String inventoryObjectId,
+            @CommandParam(value = "quantity", required = false) Integer quantity,
             @CommandParam(value = "blockShapeName", required = false) String shapeUriParam) {
 
-        int itemAmount = amount != null ? amount : 1;
-        if (itemAmount < 1) {
-            return "Invalid amount of items!";
+        int removalQuantity = quantity != null ? quantity : 1;
+        if (removalQuantity < 1) {
+            return "Invalid quantity of items!";
         }
 
-        Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
+        Set<ResourceUrn> matches = assetManager.resolve(inventoryObjectId, Prefab.class);
 
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
 
-            if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
+            if (prefab != null && prefab.hasComponent(ItemComponent.class)) {
                 EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-                List<EntityRef> itemsSlots = playerEntity.getComponent(InventoryComponent.class).itemSlots;
-                List<EntityRef> feasibleSlots = new ArrayList<>();
+                List<EntityRef> inventorySlots = Lists.reverse(playerEntity.getComponent(InventoryComponent.class).itemSlots);
+                int quantityLeft = removalQuantity;
                 int removedItems = 0;
-                int tempItemAmount = itemAmount;
 
-                for (EntityRef slot : itemsSlots) {
-                    Prefab currentPrefab = slot.getParentPrefab();
+                for (EntityRef slot : inventorySlots) {
+                    Prefab slotPrefab = slot.getParentPrefab();
 
-                    if (currentPrefab != null && currentPrefab.equals(prefab)) {
-                        feasibleSlots.add(slot);
-                        tempItemAmount = tempItemAmount - 1;
-                    }
-                }
-
-                if (tempItemAmount <= 0) {
-                    for (EntityRef slot: feasibleSlots) {
+                    if (slotPrefab != null && slotPrefab.equals(prefab)) {
                         EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
                         if (result == null) {
-                            return "Could not remove "
-                                    + prefab.getName();
-                        }
-                        if (result == EntityRef.NULL) {
+                            logger.debug("Could not remove  \""
+                                    + inventoryObjectId
+                                    + "\" from slot " + slot.getId());
+                        } else if (result == EntityRef.NULL) {
                             removedItems = removedItems + 1;
-                            if (removedItems == itemAmount) {
+                            quantityLeft = quantityLeft - 1;
+                            if (quantityLeft == 0) {
                                 break;
                             }
                         }
@@ -179,32 +175,25 @@ public class ItemCommands extends BaseComponentSystem {
                 if (removedItems > 0) {
                     return "You removed "
                             + (removedItems > 1 ? removedItems + " items of " : "an item of ")
-                            + prefab.getName()
-                            + (shapeUriParam != null ? " (Item can not have a shape)" : "");
-                } else {
-                    return "Could not find "
-                            + (itemAmount > 1 ? itemAmount + " items of " : "an item of ")
-                            + prefab.getName()
-                            + " in your inventory";
+                            + inventoryObjectId;
+                } else {    // can also mean that all removal attempts failed
+                    return "Nothing to remove, you don't have \""
+                            + inventoryObjectId
+                            + "\" in your inventory";
                 }
+
             }
         } else if (matches.size() > 1) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Requested item \"");
-            builder.append(itemPrefabName);
-            builder.append("\": matches ");
-            Joiner.on(" and ").appendTo(builder, matches);
-            builder.append(". Please fully specify one.");
-            return builder.toString();
+            return buildAmbiguousobjectIdString("item", inventoryObjectId, matches);
         }
 
         // If no matches are found for items, try blocks
-        String message = removeBlock(client, itemPrefabName, amount, shapeUriParam);
+        String message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
         if (message != null) {
             return message;
         }
 
-        return "Could not find an item or block matching \"" + itemPrefabName + "\"";
+        return "Could not find an item or block matching \"" + inventoryObjectId + "\"";
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
@@ -264,6 +253,18 @@ public class ItemCommands extends BaseComponentSystem {
         return result;
     }
 
+    private String buildAmbiguousobjectIdString(String objectType, String objectId, Set<ResourceUrn> possibleMatches) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Specified ");
+        builder.append(objectType);
+        builder.append(" id \"");
+        builder.append(objectId);
+        builder.append("\" is not unique. Possible matches: ");
+        Joiner.on(", ").appendTo(builder, possibleMatches);
+
+        return builder.toString();
+    }
+
 
     public String removeBlock(
             @Sender EntityRef sender,
@@ -285,17 +286,7 @@ public class ItemCommands extends BaseComponentSystem {
                         if (resolvedShapeUris.isEmpty()) {
                             return "Found block. No shape found for '" + shapeUriParam + "'";
                         } else if (resolvedShapeUris.size() > 1) {
-                            StringBuilder builder = new StringBuilder();
-                            builder.append("Found block. Non-unique shape name, possible matches: ");
-                            Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
-                            while (shapeUris.hasNext()) {
-                                builder.append(shapeUris.next().toString());
-                                if (shapeUris.hasNext()) {
-                                    builder.append(", ");
-                                }
-                            }
-
-                            return builder.toString();
+                            return buildAmbiguousobjectIdString("block", shapeUriParam, resolvedShapeUris);
                         }
                         blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
                     }
@@ -314,10 +305,7 @@ public class ItemCommands extends BaseComponentSystem {
             return removeBlock(blockFamily, quantity, sender);
 
         } else if (matchingUris.size() > 1) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Non-unique block name, possible matches: ");
-            Joiner.on(", ").appendTo(builder, matchingUris);
-            return builder.toString();
+            return buildAmbiguousobjectIdString("block", uri, matchingUris);
         }
 
         return null;
