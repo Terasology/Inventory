@@ -146,72 +146,18 @@ public class ItemCommands extends BaseComponentSystem {
 
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
-
-            if (prefab != null && prefab.hasComponent(ItemComponent.class)) {
-                boolean isStackable = !prefab.getComponent(ItemComponent.class).stackId.isEmpty();
-
-                EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-                List<EntityRef> inventorySlots = Lists.reverse(playerEntity.getComponent(InventoryComponent.class).itemSlots);
-                int quantityLeft = removalQuantity;
-                int removedItems = 0;
-
-                for (EntityRef slot : inventorySlots) {
-                    Prefab slotPrefab = slot.getParentPrefab();
-
-                    if (slotPrefab != null && slotPrefab.equals(prefab)) {
-
-                        EntityRef result = null;
-                        if (isStackable) {
-                            ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
-                            if (itemComponent != null) {
-                                if (quantityLeft >= itemComponent.stackCount) {
-                                    result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, itemComponent.stackCount);
-                                    removedItems = removedItems + itemComponent.stackCount;
-                                    quantityLeft = quantityLeft - itemComponent.stackCount;
-                                } else {
-                                    result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, quantityLeft);
-                                    removedItems = removedItems + quantityLeft;
-                                    quantityLeft = quantityLeft - quantityLeft;
-                                }
-                            }
-                        } else {
-                            result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
-                            result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
-                            removedItems = removedItems + 1;
-                            quantityLeft = quantityLeft - 1;
-                        }
-
-                        if (result == null) {
-                            logger.debug("Could not remove  \""
-                                    + inventoryObjectId
-                                    + "\" from slot " + slot.getId());
-                        } else if (result == EntityRef.NULL) {
-                            if (quantityLeft == 0) {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (removedItems > 0) {
-                    return "You removed "
-                            + (removedItems > 1 ? removedItems + " items of " : "an item of ")
-                            + inventoryObjectId;
-                } else {    // can also mean that all removal attempts failed
-                    return "Nothing to remove, you don't have \""
-                            + inventoryObjectId
-                            + "\" in your inventory";
-                }
-
+            String message = removeItem(prefab, quantity, client);
+            if (message != null) {
+                return message;
             }
         } else if (matches.size() > 1) {
             return buildAmbiguousobjectIdString("item", inventoryObjectId, matches);
-        }
-
-        // If no matches are found for items, try blocks
-        String message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
-        if (message != null) {
-            return message;
+        } else {
+            // If no matches are found for items, try blocks
+            String message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
+            if (message != null) {
+                return message;
+            }
         }
 
         return "Could not find an item or block matching \"" + inventoryObjectId + "\"";
@@ -284,6 +230,66 @@ public class ItemCommands extends BaseComponentSystem {
         Joiner.on(", ").appendTo(builder, possibleMatches);
 
         return builder.toString();
+    }
+
+    private String removeItem(Prefab itemPrefab, int removalQuantity, EntityRef client) {
+
+        if (prefab != null && prefab.hasComponent(ItemComponent.class)) {
+            boolean isStackable = !prefab.getComponent(ItemComponent.class).stackId.isEmpty();
+
+            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+            List<EntityRef> inventorySlots = Lists.reverse(playerEntity.getComponent(InventoryComponent.class).itemSlots);
+            int quantityLeft = removalQuantity;
+            int removedItems = 0;
+
+            for (EntityRef slot : inventorySlots) {
+                Prefab slotPrefab = slot.getParentPrefab();
+
+                if (slotPrefab != null && slotPrefab.equals(prefab)) {
+
+                    EntityRef result = null;
+                    if (isStackable) {
+                        ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
+                        if (itemComponent != null) {
+                            if (quantityLeft >= itemComponent.stackCount) {
+                                result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, itemComponent.stackCount);
+                                removedItems = removedItems + itemComponent.stackCount;
+                                quantityLeft = quantityLeft - itemComponent.stackCount;
+                            } else {
+                                result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, quantityLeft);
+                                removedItems = removedItems + quantityLeft;
+                                quantityLeft = quantityLeft - quantityLeft;
+                            }
+                        }
+                    } else {
+                        result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                        result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                        removedItems = removedItems + 1;
+                        quantityLeft = quantityLeft - 1;
+                    }
+
+                    if (result == null) {
+                        logger.debug("Could not remove  \""
+                                + inventoryObjectId
+                                + "\" from slot " + slot.getId());
+                    } else if (result == EntityRef.NULL) {
+                        if (quantityLeft == 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (removedItems > 0) {
+                return "You removed "
+                        + (removedItems > 1 ? removedItems + " items of " : "an item of ")
+                        + inventoryObjectId;
+            } else {    // can also mean that all removal attempts failed
+                return "Nothing to remove, you don't have \""
+                        + inventoryObjectId
+                        + "\" in your inventory";
+            }
+        }
     }
 
 
