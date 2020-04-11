@@ -231,7 +231,7 @@ public class ItemCommands extends BaseComponentSystem {
         return builder.toString();
     }
 
-    private String removeItem(Prefab itemPrefab, int removalQuantity, EntityRef client) {
+    private String removeItem(Prefab prefab, int removalQuantity, EntityRef client) {
 
         if (prefab != null && prefab.hasComponent(ItemComponent.class)) {
             boolean isStackable = !prefab.getComponent(ItemComponent.class).stackId.isEmpty();
@@ -289,6 +289,8 @@ public class ItemCommands extends BaseComponentSystem {
                         + "\" in your inventory";
             }
         }
+
+        return null;
     }
 
 
