@@ -311,61 +311,46 @@ public class ItemCommands extends BaseComponentSystem {
         return null;
     }
 
-    private String removeBlock(BlockFamily blockFamily, int itemAmount, EntityRef client) {
+    private String removeBlock(BlockFamily blockFamily, int removalQuantity, EntityRef client) {
         boolean isStackable = blockFamily.getArchetypeBlock().isStackable();
 
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-        List<EntityRef> itemsSlots = playerEntity.getComponent(InventoryComponent.class).itemSlots;
-        List<EntityRef> feasibleSlots = new ArrayList<>();
+        List<EntityRef> inventorySlots = Lists.reverse(playerEntity.getComponent(InventoryComponent.class).itemSlots);
+        int quantityLeft = removalQuantity;
         int removedItems = 0;
-        int tempItemAmount = itemAmount;
 
-        for (EntityRef slot : itemsSlots) {
-            if (!slot.hasComponent(BlockItemComponent.class)) {
-                continue;
-            }
-            BlockFamily currentBlockFamily = slot.getComponent(BlockItemComponent.class).blockFamily;
+        for (EntityRef slot : inventorySlots) {
+            if (slot.hasComponent(BlockItemComponent.class)) {
+                BlockFamily slotBlockFamily = slot.getComponent(BlockItemComponent.class).blockFamily;
 
-            if (currentBlockFamily != null && currentBlockFamily.equals(blockFamily)) {
+                if (slotBlockFamily != null && slotBlockFamily.equals(blockFamily)) {
 
-                if (!isStackable) {
-                    feasibleSlots.add(slot);
-                    tempItemAmount = tempItemAmount - 1;
-                } else {
-                    ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
-                    if (itemComponent != null) {
-                        feasibleSlots.add(slot);
-                        tempItemAmount = tempItemAmount - itemComponent.stackCount;
-                    }
-                }
-            }
-        }
-
-        if (tempItemAmount <= 0) {
-            for (EntityRef slot : feasibleSlots) {
-                if (!isStackable) {
-                    EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
-                    if (result == null) {
-                        return "Could not remove "
-                                + blockFamily.getDisplayName();
-                    }
-                    if (result == EntityRef.NULL) {
-                        removedItems = removedItems + 1;
-                        if (removedItems == itemAmount) {
-                            break;
+                    EntityRef result = null;
+                    if (isStackable) {
+                        ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
+                        if (itemComponent != null) {
+                            if (quantityLeft >= itemComponent.stackCount) {
+                                result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, itemComponent.stackCount);
+                                removedItems = removedItems + itemComponent.stackCount;
+                                quantityLeft = quantityLeft - itemComponent.stackCount;
+                            } else {
+                                result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, quantityLeft);
+                                removedItems = removedItems + quantityLeft;
+                                quantityLeft = quantityLeft - quantityLeft;
+                            }
                         }
+                    } else {
+                        result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, 1);
+                        removedItems = removedItems + 1;
+                        quantityLeft = quantityLeft - 1;
                     }
-                } else {
-                    ItemComponent itemComponent = slot.getComponent(ItemComponent.class);
-                    int currentRemoveAmount = (itemComponent.stackCount >= (itemAmount - removedItems)) ? (itemAmount - removedItems) : itemComponent.stackCount;
-                    EntityRef result = inventoryManager.removeItem(playerEntity, EntityRef.NULL, slot, true, currentRemoveAmount);
+
                     if (result == null) {
-                        return "Could not remove "
-                                + blockFamily.getDisplayName();
-                    }
-                    if (result == EntityRef.NULL) {
-                        removedItems = removedItems + currentRemoveAmount;
-                        if (removedItems == itemAmount) {
+                        logger.debug("Could not remove \""
+                                + blockFamily.getDisplayName()
+                                + "\" from slot " + slot.getId());
+                    } else if (result == EntityRef.NULL) {
+                        if (quantityLeft == 0) {
                             break;
                         }
                     }
@@ -377,11 +362,10 @@ public class ItemCommands extends BaseComponentSystem {
             return "You removed "
                     + (removedItems > 1 ? removedItems + " blocks of " : "a block of ")
                     + blockFamily.getDisplayName();
-        } else {
-            return "Could not find "
-                    + (itemAmount > 1 ? itemAmount + " blocks of " : "a block of ")
+        } else {    // can also mean that all removal attempts failed
+            return "Nothing to remove, you don't have \""
                     + blockFamily.getDisplayName()
-                    + " in your inventory";
+                    + "\" in your inventory";
         }
     }
 
