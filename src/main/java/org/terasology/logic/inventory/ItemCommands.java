@@ -282,7 +282,7 @@ public class ItemCommands extends BaseComponentSystem {
             if (removedItems > 0) {
                 return "You removed "
                         + (removedItems > 1 ? removedItems + " items of " : "an item of ")
-                        + prefab.getName()
+                        + prefab.getName();
             } else {    // can also mean that all removal attempts failed
                 return "Nothing to remove, you don't have \""
                         + prefab.getName()
