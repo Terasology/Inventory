@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @RegisterSystem
+// TODO: Check whether this is really needed. Was introduced by darshan3 to share item commands through core registry
 @Share(ItemCommands.class)
 public class ItemCommands extends BaseComponentSystem {
 
@@ -114,7 +115,7 @@ public class ItemCommands extends BaseComponentSystem {
             }
 
         } else if (matches.size() > 1) {
-            return buildAmbiguousobjectIdString("item", itemPrefabName, matches);
+            return buildAmbiguousObjectIdString("item", itemPrefabName, matches);
         }
 
         // If no matches are found for items, try blocks
@@ -142,25 +143,23 @@ public class ItemCommands extends BaseComponentSystem {
             return "Invalid quantity of items!";
         }
 
+        String message;
         Set<ResourceUrn> matches = assetManager.resolve(inventoryObjectId, Prefab.class);
-
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
-            String message = removeItem(prefab, quantity, client);
-            if (message != null) {
-                return message;
-            }
+            message = removeItem(prefab, quantity, client);
         } else if (matches.size() > 1) {
-            return buildAmbiguousobjectIdString("item", inventoryObjectId, matches);
+            message = buildAmbiguousObjectIdString("item", inventoryObjectId, matches);
         } else {
             // If no matches are found for items, try blocks
-            String message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
-            if (message != null) {
-                return message;
-            }
+            message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
         }
 
-        return "Could not find an item or block matching \"" + inventoryObjectId + "\"";
+        if (message != null) {
+            return message;
+        } else {
+            return "Could not find an item or block matching \"" + inventoryObjectId + "\"";
+        }
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
@@ -220,7 +219,7 @@ public class ItemCommands extends BaseComponentSystem {
         return result;
     }
 
-    private String buildAmbiguousobjectIdString(String objectType, String objectId, Set<ResourceUrn> possibleMatches) {
+    private String buildAmbiguousObjectIdString(String objectType, String objectId, Set<ResourceUrn> possibleMatches) {
         StringBuilder builder = new StringBuilder();
         builder.append("Specified ");
         builder.append(objectType);
@@ -270,7 +269,7 @@ public class ItemCommands extends BaseComponentSystem {
 
                     if (result == null) {
                         logger.debug("Could not remove  \""
-                                + inventoryObjectId
+                                + prefab.getName()
                                 + "\" from slot " + slot.getId());
                     } else if (result == EntityRef.NULL) {
                         if (quantityLeft == 0) {
@@ -283,10 +282,10 @@ public class ItemCommands extends BaseComponentSystem {
             if (removedItems > 0) {
                 return "You removed "
                         + (removedItems > 1 ? removedItems + " items of " : "an item of ")
-                        + inventoryObjectId;
+                        + prefab.getName();
             } else {    // can also mean that all removal attempts failed
                 return "Nothing to remove, you don't have \""
-                        + inventoryObjectId
+                        + prefab.getName();
                         + "\" in your inventory";
             }
         }
@@ -313,7 +312,7 @@ public class ItemCommands extends BaseComponentSystem {
                         if (resolvedShapeUris.isEmpty()) {
                             return "Found block. No shape found for '" + shapeUriParam + "'";
                         } else if (resolvedShapeUris.size() > 1) {
-                            return buildAmbiguousobjectIdString("block", shapeUriParam, resolvedShapeUris);
+                            return buildAmbiguousObjectIdString("block", shapeUriParam, resolvedShapeUris);
                         }
                         blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
                     }
@@ -332,7 +331,7 @@ public class ItemCommands extends BaseComponentSystem {
             return removeBlock(blockFamily, quantity, sender);
 
         } else if (matchingUris.size() > 1) {
-            return buildAmbiguousobjectIdString("block", uri, matchingUris);
+            return buildAmbiguousObjectIdString("block", uri, matchingUris);
         }
 
         return null;
@@ -394,14 +393,5 @@ public class ItemCommands extends BaseComponentSystem {
                     + blockFamily.getDisplayName()
                     + "\" in your inventory";
         }
-    }
-
-    private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
-        List<T> result = Lists.newArrayList();
-        for (T item : items) {
-            result.add(item);
-        }
-        Collections.sort(result);
-        return result;
     }
 }
