@@ -134,25 +134,27 @@ public class ItemCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String remove(
             @Sender EntityRef client,
-            @CommandParam("prefabId") String inventoryObjectId,
-            @CommandParam(value = "quantity", required = false) Integer quantity,
+            @CommandParam("objectID") String inventoryObjectId,
+            @CommandParam(value = "quantity", required = false) Integer inputQuantity,
             @CommandParam(value = "blockShapeName", required = false) String shapeUriParam) {
 
-        int removalQuantity = quantity != null ? quantity : 1;
+        int removalQuantity = inputQuantity != null ? inputQuantity : 1;
         if (removalQuantity < 1) {
-            return "Invalid quantity of items!";
+            return "Invalid quantity of objects to remove!";
         }
 
-        String message;
+        String message = null;
         Set<ResourceUrn> matches = assetManager.resolve(inventoryObjectId, Prefab.class);
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
-            message = removeItem(prefab, quantity, client);
+            message = removeItem(prefab, removalQuantity, client);
         } else if (matches.size() > 1) {
             message = buildAmbiguousObjectIdString("item", inventoryObjectId, matches);
-        } else {
+        }
+
+        if (message == null) {
             // If no matches are found for items, try blocks
-            message = removeBlock(client, inventoryObjectId, quantity, shapeUriParam);
+            message = removeBlock(client, inventoryObjectId, removalQuantity, shapeUriParam);
         }
 
         if (message != null) {
