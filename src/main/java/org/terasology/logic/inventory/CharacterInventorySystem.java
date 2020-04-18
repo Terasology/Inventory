@@ -17,6 +17,7 @@
 package org.terasology.logic.inventory;
 
 import org.terasology.logic.characters.events.PlayerDeathEvent;
+import org.terasology.math.JomlUtil;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
@@ -130,7 +131,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             pickupItem.saveComponent(pickupComponent);
         }
 
-        pickupItem.send(new ImpulseEvent(event.getImpulse()));
+        pickupItem.send(new ImpulseEvent(JomlUtil.from(event.getImpulse())));
     }
 
     @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
@@ -185,9 +186,9 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             Vector3f direction = localPlayer.getViewDirection();
 
             Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
-            HitResult hitResult = physics.rayTrace(position, direction, 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
+            HitResult hitResult = physics.rayTrace(JomlUtil.from(position), JomlUtil.from(direction), 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
             if (hitResult.isHit()) {
-                Vector3f possibleNewPosition = hitResult.getHitPoint();
+                Vector3f possibleNewPosition = JomlUtil.from(hitResult.getHitPoint());
                 maxAllowedDistanceInDirection = possibleNewPosition.sub(position);
             }
 

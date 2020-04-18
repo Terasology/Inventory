@@ -28,6 +28,7 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -80,7 +81,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
             if (itemInSlot.exists()) {
                 inventoryManager.removeItem(entity, entity, itemInSlot, false);
                 itemInSlot.send(new DropItemEvent(position));
-                itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                itemInSlot.send(new ImpulseEvent(JomlUtil.from(random.nextVector3f(30.0f))));
             }
         }
     }
