@@ -36,15 +36,8 @@ import java.util.List;
  * {
  *   "StartingInventory": {
  *     "items": [
- *       { "uri": "core:pickaxe", "quantity": 1 },
- *       { "uri": "core:axe", "quantity": 1 },
- *       { "uri": "core:coal", "quantity": 149 },
- *       { "uri": "core:shovel", "quantity": 1 },
- *       { "uri": "CoreBlocks:Torch", "quantity": 99 },
- *       { "uri": "CoreBlocks:Torch", "quantity": 120 },
- *       { "uri": "core:explodeTool", "quantity": 1 },
- *       { "uri": "core:railgunTool", "quantity": 1 },
- *       { "uri": "CoreBlocks:chest", "quantity": 1 }
+ *       { "uri": "CoreItems:pickaxe", "quantity": 1 },
+ *       { "uri": "CoreBlocks:companion", "quantity": 42 }
  *     ]
  *   }
  * }
