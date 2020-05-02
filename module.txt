@@ -1,6 +1,6 @@
 {
     "id" : "Inventory",
-    "version" : "1.0.0-SNAPSHOT",
+    "version" : "1.1.0",
     "displayName" : "Core Inventory",
     "author": "Various",
     "description" : "This module adds a standard and simple inventory system as well as hooks for other modules",
