@@ -1,6 +1,6 @@
 {
     "id" : "Inventory",
-    "version" : "1.1.1",
+    "version" : "1.2.0",
     "isReleaseManaged": true,
     "displayName" : "Core Inventory",
     "author": "The Terasology Foundation",
