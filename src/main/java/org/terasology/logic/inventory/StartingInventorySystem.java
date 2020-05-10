@@ -77,8 +77,16 @@ public class StartingInventorySystem extends BaseComponentSystem {
         entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
+    /**
+     * Ensure that the item references a non-empty URI and a quantity greater than zero.
+     *
+     * This method logs WARNINGs if the item could not be validated.
+     *
+     * @param item the inventory item to validate
+     * @return true if the item has non-empty URI and quantity greater zero, false otherwise
+     */
     private boolean validateItem(StartingInventoryComponent.InventoryItem item) {
-        if (item.uri == null) {
+        if (item.uri == null || item.uri.isEmpty()) {
             logger.warn("Improperly specified starting inventory item: Uri is null");
             return false;
         }
@@ -96,7 +104,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
         String uri = item.uri;
         int quantity = item.quantity;
 
-        final List<EntityRef> objects = foo(uri, quantity, item.items)
+        final List<EntityRef> objects = tryAsBlock(uri, quantity, item.items)
                 .map(Optional::of)
                 .orElseGet(() -> tryAsItem(uri, quantity))
                 .orElse(Lists.newArrayList());
@@ -108,7 +116,9 @@ public class StartingInventorySystem extends BaseComponentSystem {
 
     private void fillInventory(EntityRef entity,
                                List<StartingInventoryComponent.InventoryItem> items) {
-        InventoryComponent nestedInventory = new InventoryComponent(30);
+        InventoryComponent nestedInventory =
+                Optional.ofNullable(entity.getComponent(InventoryComponent.class))
+                        .orElseGet(() -> new InventoryComponent(30));
         entity.addOrSaveComponent(nestedInventory);
         items.stream()
                 .filter(this::validateItem)
@@ -116,14 +126,8 @@ public class StartingInventorySystem extends BaseComponentSystem {
     }
 
     private Optional<List<EntityRef>> tryAsBlock(String uri,
-                                                 int quantity) {
-        return Optional.ofNullable(blockManager.getBlockFamily(uri))
-                .map(blockFamily -> Lists.newArrayList(blockFactory.newInstance(blockFamily, quantity)));
-    }
-
-    private Optional<List<EntityRef>> foo(String uri,
-                                          int quantity,
-                                          List<StartingInventoryComponent.InventoryItem> nestedItems) {
+                                                 int quantity,
+                                                 List<StartingInventoryComponent.InventoryItem> nestedItems) {
         return Optional.ofNullable(blockManager.getBlockFamily(uri))
                 .map(blockFamily -> {
                     if (nestedItems.isEmpty()) {
@@ -142,12 +146,5 @@ public class StartingInventorySystem extends BaseComponentSystem {
         return Optional.ofNullable(prefabManager.getPrefab(uri))
                 .filter(p -> p.hasComponent(ItemComponent.class))
                 .map(p -> Stream.generate(() -> entityManager.create(uri)).limit(quantity).collect(Collectors.toList()));
-    }
-
-
-    private long availableSlots(InventoryComponent inventoryComponent) {
-        return inventoryComponent.itemSlots.stream()
-                .filter(ref -> ref.equals(EntityRef.NULL))
-                .count();
     }
 }
