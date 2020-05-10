@@ -55,11 +55,12 @@ public class StartingInventorySystem extends BaseComponentSystem {
         blockFactory = new BlockItemFactory(entityManager);
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
-                                    StartingInventoryComponent startingInventoryComponent) {
-        InventoryComponent inventoryComponent = entityRef.getComponent(InventoryComponent.class);
+                                    StartingInventoryComponent startingInventoryComponent,
+                                    InventoryComponent inventoryComponent) {
+
         if (entityRef.getParentPrefab() != null) {
             logger.info("Adding starting inventory to {}, entity has {} slots",
                     entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
@@ -84,6 +85,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
                     uri, quantity);
             return false;
         }
+
         return addToInventory(entityRef, uri, quantity, inventoryComponent);
     }
 
@@ -92,7 +94,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
                                    int quantity,
                                    InventoryComponent inventoryComponent) {
         // Determine if this is a Block or Item
-        logger.info("Adding {} {}", quantity, uri);
+        logger.info("Adding {} x {}", quantity, uri);
         BlockFamily blockFamily = blockManager.getBlockFamily(uri);
         boolean success = true;
         if (blockFamily != null) {
@@ -111,10 +113,12 @@ public class StartingInventorySystem extends BaseComponentSystem {
                                  int quantity,
                                  InventoryComponent inventoryComponent) {
         long available = availableSlots(inventoryComponent);
+
         if (available >= 1) {
             if (quantity > 99) {
                 logger.warn("Block stack of > 99 found. Currently maximum block stack size is 99. Adding 99");
             }
+
             return inventoryManager.giveItem(
                     entityRef, EntityRef.NULL, blockFactory.newInstance(blockFamily, Math.min(quantity, 99)));
         }
