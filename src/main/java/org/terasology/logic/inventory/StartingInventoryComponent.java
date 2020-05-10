@@ -21,6 +21,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.world.block.Block;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -55,7 +56,6 @@ public class StartingInventoryComponent implements Component {
     /**
      * A simple class connecting a resource (a {@link Block} or {@link Prefab}) to a quantity
      */
-    @MappedContainer
     public static class InventoryItem {
         /**
          * A resource uri, may be either a block uri or an item uri.
@@ -66,5 +66,13 @@ public class StartingInventoryComponent implements Component {
          * Must be greater than 0.
          */
         public int quantity = 1;
+
+        /**
+         * A list of objects to be nested inside this inventory item.
+         *
+         * Adding inventory items to this list will cause a {@link InventoryComponent} to be added to this object.
+         * The nested inventory is filled with the items specified in this list.
+         */
+        public List<InventoryItem> items = Lists.newLinkedList();
     }
 }

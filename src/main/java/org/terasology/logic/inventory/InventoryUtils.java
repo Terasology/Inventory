@@ -135,6 +135,10 @@ public final class InventoryUtils {
         return true;
     }
 
+    public static boolean isStackable(ItemComponent item) {
+        return item != null && item.stackId != null && !item.stackId.isEmpty();
+    }
+
     private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
         if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
             return false;
@@ -295,7 +299,6 @@ public final class InventoryUtils {
         return false;
     }
 
-
     static boolean moveItemToSlots(EntityRef instigator, EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
         EntityRef fromItem = InventoryUtils.getItemAt(from, fromSlot);
         BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, fromItem, fromSlot);
@@ -315,7 +318,6 @@ public final class InventoryUtils {
 
         return movedToStack > 0 || movedToFreeSlot;
     }
-
 
     static boolean moveItem(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
         if (checkForStacking(from, slotFrom, to, slotTo)) {
