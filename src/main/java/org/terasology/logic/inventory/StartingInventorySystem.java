@@ -62,13 +62,13 @@ public class StartingInventorySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
-                                    StartingInventoryComponent startingInventoryComponent,
-                                    InventoryComponent inventoryComponent) {
+                                    StartingInventoryComponent startingInventoryComponent) {
 
-        if (entityRef.getParentPrefab() != null) {
-            logger.info("Adding starting inventory to {}, entity has {} slots",
-                    entityRef.getParentPrefab().getName(), inventoryComponent.itemSlots.size());
-        }
+        InventoryComponent inventoryComponent =
+                Optional.ofNullable(entityRef.getComponent(InventoryComponent.class))
+                        .orElse(new InventoryComponent(40));
+        entityRef.addOrSaveComponent(inventoryComponent);
+
         for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
             if (validateItem(item)) {
                 addToInventory(entityRef, item, inventoryComponent);
@@ -79,7 +79,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
 
     /**
      * Ensure that the item references a non-empty URI and a quantity greater than zero.
-     *
+     * <p>
      * This method logs WARNINGs if the item could not be validated.
      *
      * @param item the inventory item to validate
@@ -104,18 +104,25 @@ public class StartingInventorySystem extends BaseComponentSystem {
         String uri = item.uri;
         int quantity = item.quantity;
 
-        final List<EntityRef> objects = tryAsBlock(uri, quantity, item.items)
-                .map(Optional::of)
-                .orElseGet(() -> tryAsItem(uri, quantity))
-                .orElse(Lists.newArrayList());
+        final List<EntityRef> objects =
+                tryAsBlock(uri, quantity, item.items)
+                        .map(Optional::of)
+                        .orElseGet(() -> tryAsItem(uri, quantity))
+                        .orElse(Lists.newArrayList());
 
         objects.forEach(o ->
                 inventoryManager.giveItem(entityRef, EntityRef.NULL, o)
         );
     }
 
-    private void fillInventory(EntityRef entity,
-                               List<StartingInventoryComponent.InventoryItem> items) {
+    /**
+     * Adds an {@link InventoryComponent} to the given entity holding the specified items.
+     *
+     * @param entity the entity that should hold the nested inventory
+     * @param items  items to be filled into the nested inventory
+     */
+    private void addNestedInventory(EntityRef entity,
+                                    List<StartingInventoryComponent.InventoryItem> items) {
         InventoryComponent nestedInventory =
                 Optional.ofNullable(entity.getComponent(InventoryComponent.class))
                         .orElseGet(() -> new InventoryComponent(30));
@@ -129,16 +136,15 @@ public class StartingInventorySystem extends BaseComponentSystem {
                                                  int quantity,
                                                  List<StartingInventoryComponent.InventoryItem> nestedItems) {
         return Optional.ofNullable(blockManager.getBlockFamily(uri))
-                .map(blockFamily -> {
-                    if (nestedItems.isEmpty()) {
-                        return Lists.newArrayList(blockFactory.newInstance(blockFamily, quantity));
-                    } else {
-                        return Stream.generate(() -> blockFactory.newInstance(blockFamily))
+                .map(blockFamily ->
+                        Stream.generate(() -> blockFactory.newInstance(blockFamily))
                                 .limit(quantity)
-                                .peek(block -> fillInventory(block, nestedItems))
-                                .collect(Collectors.toList());
-                    }
-                });
+                                .peek(block -> {
+                                    if (!nestedItems.isEmpty()) {
+                                        addNestedInventory(block, nestedItems);
+                                    }
+                                })
+                                .collect(Collectors.toList()));
     }
 
     private Optional<List<EntityRef>> tryAsItem(String uri,
