@@ -48,10 +48,11 @@ public class ItemCommandsTest {
 
     private static ModuleTestingEnvironment context;
 
-    Context hostContext;
-    EntityManager entityManager;
-    InventoryManager inventoryManager;
-    BlockManager blockManager;
+    private Context hostContext;
+    private EntityManager entityManager;
+    private InventoryManager inventoryManager;
+    private BlockManager blockManager;
+    private ItemCommands itemCommands;
 
     @BeforeAll
     public static void setup() throws Exception {
@@ -75,6 +76,7 @@ public class ItemCommandsTest {
         entityManager = hostContext.get(EntityManager.class);
         inventoryManager = hostContext.get(InventoryManager.class);
         blockManager = hostContext.get(BlockManager.class);
+        itemCommands = hostContext.get(ItemCommands.class);
     }
 
     @ParameterizedTest
@@ -87,7 +89,7 @@ public class ItemCommandsTest {
 
         Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'", EntityRef.NULL, blockItem);
 
-        inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
+        itemCommands.give(inventory, URI_DIRT, amount, null);
 
         final List<EntityRef> filledSlots =
                 inventory.getComponent(InventoryComponent.class).itemSlots.stream()
