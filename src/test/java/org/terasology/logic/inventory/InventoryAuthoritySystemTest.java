@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.inventory;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -48,7 +48,7 @@ public class InventoryAuthoritySystemTest {
     private InventoryComponent inventoryComp;
     private EntityManager entityManager;
 
-    @Before
+    @BeforeEach
     public void setup() {
         inventoryAuthoritySystem = new InventoryAuthoritySystem();
         instigator = Mockito.mock(EntityRef.class);

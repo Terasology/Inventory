@@ -1,11 +1,13 @@
 {
-    "id" : "Inventory",
-    "version" : "1.1.0",
+    "id": "Inventory",
+    "version": "1.1.0",
     "isReleaseManaged": true,
-    "displayName" : "Core Inventory",
+    "displayName": "Core Inventory",
     "author": "The Terasology Foundation",
-    "description" : "This module adds a standard and simple inventory system as well as hooks for other modules",
-    "dependencies" : [],
+    "description": "This module adds a standard and simple inventory system as well as hooks for other modules",
+    "dependencies": [
+        {"id": "ModuleTestingEnvironment", "minVersion": "0.1.0", "optional": true}
+    ],
     "isLibrary": true,
     "isAugmentation": true
 }

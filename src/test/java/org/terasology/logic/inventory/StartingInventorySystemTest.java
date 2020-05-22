@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.inventory;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class StartingInventorySystemTest {
     private BlockItemFactory blockItemFactory;
     private PrefabManager prefabManager;
 
-    @Before
+    @BeforeEach
     public void setup() {
         inventoryAuthoritySystem = new InventoryAuthoritySystem();
         startingInventorySystem = new StartingInventorySystem();
