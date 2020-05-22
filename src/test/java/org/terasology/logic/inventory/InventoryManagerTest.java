@@ -16,14 +16,21 @@
 
 package org.terasology.logic.inventory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.TeraMath;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
@@ -31,6 +38,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Verify that adding blocks to an inventory is working as expected.
@@ -39,11 +47,16 @@ import java.util.stream.Collectors;
  *
  * @see GiveItemTest
  */
-public class GiveBlockTest {
+public class InventoryManagerTest {
 
     static final String URI_DIRT = "CoreAssets:Dirt";
 
     private static ModuleTestingEnvironment context;
+
+    Context hostContext;
+    EntityManager entityManager;
+    InventoryManager inventoryManager;
+    BlockManager blockManager;
 
     @BeforeAll
     public static void setup() throws Exception {
@@ -61,20 +74,25 @@ public class GiveBlockTest {
         context.tearDown();
     }
 
-    @Test
-    public void giveItemSingleBlock() {
-        final Context hostContext = context.getHostContext();
-        final EntityManager entityManager = hostContext.get(EntityManager.class);
-        final InventoryManager inventoryManager = hostContext.get(InventoryManager.class);
-        final BlockManager blockManager = hostContext.get(BlockManager.class);
+    @BeforeEach
+    public void beforeEach() {
+        hostContext = context.getHostContext();
+        entityManager = hostContext.get(EntityManager.class);
+        inventoryManager = hostContext.get(InventoryManager.class);
+        blockManager = hostContext.get(BlockManager.class);
+    }
 
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 99, 100})
+    public void giveItemSingleBlockStack(int amount) {
         final EntityRef inventory = entityManager.create(new InventoryComponent(3));
 
-        BlockItemFactory factory = new BlockItemFactory(entityManager);
-        EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT));
+        final BlockItemFactory factory = new BlockItemFactory(entityManager);
+        final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT), amount);
+
         Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'", EntityRef.NULL, blockItem);
 
-        inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
+        hostContext.get(ItemCommands.class).give(inventory, URI_DIRT, amount, null);
 
         final List<EntityRef> filledSlots =
                 inventory.getComponent(InventoryComponent.class).itemSlots.stream()
@@ -83,6 +101,19 @@ public class GiveBlockTest {
 
         Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
 
-        filledSlots.forEach(item -> Assert.assertEquals("Slot should contain exactly the added block", blockItem, item));
+        filledSlots.forEach(item ->
+                Assert.assertEquals("Slot should contain exactly the added block", blockItem, item));
+
+        final int maxStackSize = Byte.toUnsignedInt(blockItem.getComponent(ItemComponent.class).maxStackSize);
+        for (int slot = 0; slot < filledSlots.size(); slot++) {
+            int actualStackCount = Byte.toUnsignedInt(filledSlots.get(slot).getComponent(ItemComponent.class).stackCount);
+            Assert.assertEquals("Unexpected stack count in slot " + slot + "!",
+                    expectedStackCount(slot, amount, maxStackSize), actualStackCount);
+        }
+
+    }
+
+    private int expectedStackCount(int slot, int amount, int maxStackSize) {
+        return (slot == (amount / maxStackSize)) ? (amount % maxStackSize) : maxStackSize;
     }
 }
