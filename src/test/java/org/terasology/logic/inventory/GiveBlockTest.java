@@ -21,20 +21,28 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.terasology.context.Context;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.items.BlockItemFactory;
 
+import java.util.List;
 import java.util.Set;
-
-import static com.google.common.collect.Sets.newHashSet;
+import java.util.stream.Collectors;
 
 /**
  * Verify that adding blocks to an inventory is working as expected.
- *
+ * <p>
  * Dual test to {@link GiveItemTest}.
  *
  * @see GiveItemTest
  */
 public class GiveBlockTest {
+
+    static final String URI_DIRT = "CoreAssets:Dirt";
+
     private static ModuleTestingEnvironment context;
 
     @BeforeAll
@@ -42,7 +50,7 @@ public class GiveBlockTest {
         context = new ModuleTestingEnvironment() {
             @Override
             public Set<String> getDependencies() {
-                return Sets.newHashSet("Inventory");
+                return Sets.newHashSet("CoreAssets", "Inventory");
             }
         };
         context.setup();
@@ -55,11 +63,26 @@ public class GiveBlockTest {
 
     @Test
     public void giveItemSingleBlock() {
-        Assert.assertEquals("Hello", "Hell"+"o");
-    }
+        final Context hostContext = context.getHostContext();
+        final EntityManager entityManager = hostContext.get(EntityManager.class);
+        final InventoryManager inventoryManager = hostContext.get(InventoryManager.class);
+        final BlockManager blockManager = hostContext.get(BlockManager.class);
 
-    @Test
-    public void giveItemSingleBlockAgain() {
-        Assert.assertEquals("Hello", "Hello");
+        final EntityRef inventory = entityManager.create(new InventoryComponent(3));
+
+        BlockItemFactory factory = new BlockItemFactory(entityManager);
+        EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT));
+        Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'", EntityRef.NULL, blockItem);
+
+        inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
+
+        final List<EntityRef> filledSlots =
+                inventory.getComponent(InventoryComponent.class).itemSlots.stream()
+                        .filter(entityRef -> entityRef != EntityRef.NULL)
+                        .collect(Collectors.toList());
+
+        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
+
+        filledSlots.forEach(item -> Assert.assertEquals("Slot should contain exactly the added block", blockItem, item));
     }
 }
