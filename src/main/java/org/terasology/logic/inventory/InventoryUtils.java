@@ -91,15 +91,7 @@ public final class InventoryUtils {
             return false;
         }
 
-        if (!isSameStackId(itemComp1, itemComp2)) {
-            return false;
-        }
-
-        if (!hasSameAttributes(item1, item2)) {
-            return false;
-        }
-
-        return true;
+        return isSameStackId(itemComp1, itemComp2) && hasSameAttributes(item1, item2);
     }
 
     private static boolean hasSameAttributes(EntityRef from, EntityRef to) {
@@ -143,18 +135,26 @@ public final class InventoryUtils {
      *
      * @param item the item to check whether it is stackable
      *
-     * @return true iff the item is stackable
+     * @return true iff the item exists and is stackable
      */
     public static boolean isStackable(ItemComponent item) {
-        return item != null && item.stackId != null && !item.stackId.isEmpty() && item.maxStackSize > 1;
+        return hasStackId(item) && item.maxStackSize > 1;
+    }
+
+    /**
+     * Determine whether an item has a non-empty {@link ItemComponent#stackId}.
+     *
+     * A non-empty stack id is a necessity for an item to be stackable.
+     *
+     * @param item the item to check for a non-empty stack id
+     * @return true iff the item exists and has a non-empty stack id
+     */
+    private static boolean hasStackId(ItemComponent item) {
+        return item != null && item.stackId != null && !item.stackId.isEmpty();
     }
 
     private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
-        if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
-            return false;
-        }
-
-        return item1.stackId.equals(item2.stackId);
+        return hasStackId(item1) && hasStackId(item2) && item1.stackId.equals(item2.stackId);
     }
 
     private static boolean validateMove(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
