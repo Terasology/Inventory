@@ -65,7 +65,7 @@ public class InventoryScreen extends CoreScreenLayer {
     }
 
     private EntityRef getTransferEntity() {
-        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
+        return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class InventoryScreen extends CoreScreenLayer {
           similar to what was needed here to take them out of the transfer
           slot and sort them into the inventory.
         */
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
+        EntityRef playerEntity = localPlayer.getCharacterEntity();
         EntityRef movingItem = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
         EntityRef fromEntity = movingItem;
