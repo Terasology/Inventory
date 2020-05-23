@@ -135,10 +135,6 @@ public final class InventoryUtils {
         return true;
     }
 
-    public static boolean isStackable(ItemComponent item) {
-        return item != null && item.stackId != null && !item.stackId.isEmpty();
-    }
-
     private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
         if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
             return false;
