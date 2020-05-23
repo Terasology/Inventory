@@ -17,16 +17,15 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -46,6 +45,9 @@ public class InventoryScreen extends CoreScreenLayer {
 
     @In
     private Time time;
+
+    @In
+    private InventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -69,7 +71,7 @@ public class InventoryScreen extends CoreScreenLayer {
     }
 
     @Override
-    public void onClosed(){
+    public void onClosed() {
         /*
           The code below was originally taken from moveItemSmartly() in
           InventoryCell.class and slightly modified to work here.
@@ -109,7 +111,7 @@ public class InventoryScreen extends CoreScreenLayer {
             toSlots = IntStream.range(0, totalSlotCount).boxed().collect(Collectors.toList());
         }
 
-        CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
+        inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
 
 
 
@@ -120,7 +122,7 @@ public class InventoryScreen extends CoreScreenLayer {
          The code to drop an item right in front of the player that
          was in that class was almost exactly what was needed here.
         */
-        EntityRef item  = InventoryUtils.getItemAt(movingItem, 0);
+        EntityRef item = InventoryUtils.getItemAt(movingItem, 0);
 
         int count = InventoryUtils.getStackCount(item);
 

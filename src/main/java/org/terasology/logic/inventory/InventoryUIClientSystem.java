@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -53,7 +52,7 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     private NUIManager nuiManager;
 
     @In
-    private InventoryManager invManager;
+    private InventoryManager inventoryManager;
 
     @In
     private LocalPlayer localPlayer;
@@ -109,9 +108,9 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         EntityRef movingItemSlot = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
-        movingItemItem = invManager.getItemInSlot(movingItemSlot, 0);
+        movingItemItem = inventoryManager.getItemInSlot(movingItemSlot, 0);
 
-        movingItemCount = invManager.getStackSize(movingItemItem);
+        movingItemCount = inventoryManager.getStackSize(movingItemItem);
 
         EntityRef fromEntity = movingItemSlot;
         int fromSlot = 0;
@@ -143,7 +142,7 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
                 toSlots = IntStream.range(0, totalSlotCount).boxed().collect(Collectors.toList());
             }
 
-            invManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
+            inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
         }
     }
 
@@ -160,13 +159,13 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
 
             while (currentSlot >= 0 && movingItemCount > 0) {
 
-                EntityRef currentItem = invManager.getItemInSlot(playerEntity, currentSlot);
-                int currentItemCount = invManager.getStackSize(currentItem);
+                EntityRef currentItem = inventoryManager.getItemInSlot(playerEntity, currentSlot);
+                int currentItemCount = inventoryManager.getStackSize(currentItem);
                 boolean correctItem = (currentItem == movingItemItem);
 
                 if (correctItem) {
                     int count = Math.min(movingItemCount, currentItemCount);
-                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, count);
+                    inventoryManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, count);
                     movingItemCount -= count;
                 }
 
