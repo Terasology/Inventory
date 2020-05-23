@@ -135,6 +135,20 @@ public final class InventoryUtils {
         return true;
     }
 
+    /**
+     * Determine whether an {@link ItemComponent} is stackable or not.
+     * <p>
+     * An item is <emph>stackable</emph> iff it has a non-empty {@link ItemComponent#stackId} and a {@link
+     * ItemComponent#maxStackSize} greater than one.
+     *
+     * @param item the item to check whether it is stackable
+     *
+     * @return true iff the item is stackable
+     */
+    public static boolean isStackable(ItemComponent item) {
+        return item != null && item.stackId != null && !item.stackId.isEmpty() && item.maxStackSize > 1;
+    }
+
     private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
         if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
             return false;
