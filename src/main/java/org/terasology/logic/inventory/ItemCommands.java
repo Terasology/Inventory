@@ -312,7 +312,7 @@ public class ItemCommands extends BaseComponentSystem {
             if (slotPrefab != null && slotPrefab.equals(prefab)) {
                 quantityLeft = removeObjectFromSlot(slot,
                         playerEntity,
-                        InventoryUtils.isStackable(prefab.getComponent(ItemComponent.class)),
+                        InventoryUtils.isStackable(prefab),
                         displayName,
                         quantityLeft);
 
