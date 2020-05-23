@@ -137,7 +137,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
             logger.error("Failed to find ItemComponent for {}", uri);
             return false;
         }
-        if (component.stackId == null || component.stackId.length() == 0) {
+        if (!InventoryUtils.isStackable(component)) {
             // Item is not stackable, one slot used per item
             if (available >= quantity) {
                 for (int i = 0; i < quantity; ++i) {

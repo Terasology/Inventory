@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2020 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
@@ -91,15 +92,7 @@ public final class InventoryUtils {
             return false;
         }
 
-        if (!isSameStackId(itemComp1, itemComp2)) {
-            return false;
-        }
-
-        if (!hasSameAttributes(item1, item2)) {
-            return false;
-        }
-
-        return true;
+        return isSameStackId(itemComp1, itemComp2) && hasSameAttributes(item1, item2);
     }
 
     private static boolean hasSameAttributes(EntityRef from, EntityRef to) {
@@ -135,12 +128,59 @@ public final class InventoryUtils {
         return true;
     }
 
-    private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
-        if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
-            return false;
-        }
+    /**
+     * Determine whether an {@link EntityRef} denotes a stackable item.
+     * <p>
+     * An entity describes a stackable item iff it has an {@link ItemComponent} for which {@link
+     * #isStackable(ItemComponent)} holds.
+     *
+     * @param entity the entity to check whether it describes a stackable item
+     * @return true iff the entity has an item component which is stackable
+     */
+    public static boolean isStackable(EntityRef entity) {
+        return isStackable(entity.getComponent(ItemComponent.class));
+    }
 
-        return item1.stackId.equals(item2.stackId);
+    /**
+     * Determine whether a {@link Prefab} is a stackable item.
+     * <p>
+     * A prefab describes a stackable item iff it has an {@link ItemComponent} for which {@link
+     * #isStackable(ItemComponent)} holds.
+     *
+     * @param prefab the prefab to check whether it describes a stackable item
+     * @return true iff the prefab has an item component which is stackable
+     */
+    public static boolean isStackable(Prefab prefab) {
+        return isStackable(prefab.getComponent(ItemComponent.class));
+    }
+
+    /**
+     * Determine whether an {@link ItemComponent} is stackable or not.
+     * <p>
+     * An item is <emph>stackable</emph> iff it has a non-empty {@link ItemComponent#stackId} and a {@link
+     * ItemComponent#maxStackSize} greater than one.
+     *
+     * @param item the item to check whether it is stackable
+     * @return true iff the item exists and is stackable
+     */
+    public static boolean isStackable(ItemComponent item) {
+        return hasStackId(item) && item.maxStackSize > 1;
+    }
+
+    /**
+     * Determine whether an item has a non-empty {@link ItemComponent#stackId}.
+     * <p>
+     * A non-empty stack id is a necessity for an item to be stackable.
+     *
+     * @param item the item to check for a non-empty stack id
+     * @return true iff the item exists and has a non-empty stack id
+     */
+    private static boolean hasStackId(ItemComponent item) {
+        return item != null && item.stackId != null && !item.stackId.isEmpty();
+    }
+
+    private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
+        return hasStackId(item1) && hasStackId(item2) && item1.stackId.equals(item2.stackId);
     }
 
     private static boolean validateMove(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {

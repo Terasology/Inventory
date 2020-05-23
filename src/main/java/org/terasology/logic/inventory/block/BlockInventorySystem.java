@@ -55,7 +55,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
             inventoryManager.switchItem(blockEntity, blockEntity, i, inventoryItem, i);
         }
         ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
-        if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
+        if (InventoryUtils.isStackable(itemComponent)) {
             itemComponent.stackId = "";
             inventoryItem.saveComponent(itemComponent);
         }

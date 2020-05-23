@@ -44,11 +44,8 @@ import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RegisterSystem
@@ -315,7 +312,7 @@ public class ItemCommands extends BaseComponentSystem {
             if (slotPrefab != null && slotPrefab.equals(prefab)) {
                 quantityLeft = removeObjectFromSlot(slot,
                         playerEntity,
-                        !prefab.getComponent(ItemComponent.class).stackId.isEmpty(),
+                        InventoryUtils.isStackable(prefab),
                         displayName,
                         quantityLeft);
 
