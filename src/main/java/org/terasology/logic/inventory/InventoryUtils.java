@@ -335,7 +335,6 @@ public final class InventoryUtils {
         return false;
     }
 
-
     static boolean moveItemToSlots(EntityRef instigator, EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
         EntityRef fromItem = InventoryUtils.getItemAt(from, fromSlot);
         BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, fromItem, fromSlot);
@@ -355,7 +354,6 @@ public final class InventoryUtils {
 
         return movedToStack > 0 || movedToFreeSlot;
     }
-
 
     static boolean moveItem(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
         if (checkForStacking(from, slotFrom, to, slotTo)) {
