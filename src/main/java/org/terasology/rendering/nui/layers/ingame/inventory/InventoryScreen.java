@@ -33,11 +33,13 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class InventoryScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
+    private static final Logger logger = LoggerFactory.getLogger(InventoryScreen.class);
 
     @In
     private LocalPlayer localPlayer;
@@ -60,21 +62,6 @@ public class InventoryScreen extends CoreScreenLayer {
     @Override
     public boolean isModal() {
         return false;
-    }
-
-    /*
-      The numbersBetween() and getTransferEntity() methods were
-      originally in the InventoryCell class. They were copied over
-      to here because they are private functions that the
-      moveItemSmartly() method needs to function. The first section
-      of code in onClosed() is based on the moveItemSmartly() method.
-    */
-    private List<Integer> numbersBetween(int start, int exclusiveEnd) {
-        List<Integer> numbers = new ArrayList<>();
-        for (int number = start; number < exclusiveEnd; number++) {
-            numbers.add(number);
-        }
-        return numbers;
     }
 
     private EntityRef getTransferEntity() {
@@ -114,20 +101,12 @@ public class InventoryScreen extends CoreScreenLayer {
 
         EntityRef targetEntity;
         List<Integer> toSlots = new ArrayList<>(totalSlotCount);
-        if (fromEntity.equals(playerEntity)) {
-
-            if (interactionTarget.exists() && interactionTargetInventory != null) {
-                targetEntity = interactionTarget;
-                toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
-            } else {
-                targetEntity = playerEntity;
-
-                toSlots = numbersBetween(0, totalSlotCount);
-
-            }
+        if (fromEntity.equals(playerEntity) && interactionTarget.exists() && interactionTargetInventory != null) {
+            targetEntity = interactionTarget;
+            toSlots = IntStream.range(0, interactionTargetInventory.itemSlots.size()).boxed().collect(Collectors.toList());
         } else {
             targetEntity = playerEntity;
-            toSlots = numbersBetween(0, totalSlotCount);
+            toSlots = IntStream.range(0, totalSlotCount).boxed().collect(Collectors.toList());
         }
 
         CoreRegistry.get(InventoryManager.class).moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);

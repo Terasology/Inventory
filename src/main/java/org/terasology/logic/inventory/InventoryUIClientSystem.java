@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory;
 
+import com.google.common.collect.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -30,31 +31,30 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
-import org.terasology.protobuf.EntityData;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
-    
+
     EntityRef movingItemItem = EntityRef.NULL;
-    
+
     int movingItemCount = 0;
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
+    private static final Logger logger = LoggerFactory.getLogger(InventoryUIClientSystem.class);
 
     @In
     private NUIManager nuiManager;
-    
+
     @In
     private InventoryManager invManager;
-    
+
     @In
     private LocalPlayer localPlayer;
 
@@ -92,27 +92,12 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         }
     }
 
-    /*
-      The numbersBetween() and getTransferEntity() methods were
-      originally in the InventoryCell class. They were copied over
-      to here because they are private functions that the
-      moveItemSmartly() method needs to function. The first section
-      of code in onClosed() is based on the moveItemSmartly() method.
-    */
-    private List<Integer> numbersBetween(int start, int exclusiveEnd) {
-        List<Integer> numbers = new ArrayList<>();
-        for (int number = start; number < exclusiveEnd; number++) {
-            numbers.add(number);
-        }
-        return numbers;
-    }
-
     private EntityRef getTransferEntity() {
         return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
     @Override
-    public void preAutoSave(){
+    public void preAutoSave() {
         /*
           The code below was originally taken from moveItemSmartly() in
           InventoryCell.class and slightly modified to work here.
@@ -125,7 +110,7 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         EntityRef movingItemSlot = playerEntity.getComponent(CharacterComponent.class).movingItem;
 
         movingItemItem = invManager.getItemInSlot(movingItemSlot, 0);
-        
+
         movingItemCount = invManager.getStackSize(movingItemItem);
 
         EntityRef fromEntity = movingItemSlot;
@@ -151,18 +136,11 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
             EntityRef targetEntity;
             List<Integer> toSlots = new ArrayList<>(totalSlotCount);
             if (fromEntity.equals(playerEntity) && interactionTarget.exists() && interactionTargetInventory != null) {
-
-                    targetEntity = interactionTarget;
-                    toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
-                } else {
-                    targetEntity = playerEntity;
-
-                    toSlots = numbersBetween(0, totalSlotCount);
-
-                }
+                targetEntity = interactionTarget;
+                toSlots = IntStream.range(0, interactionTargetInventory.itemSlots.size()).boxed().collect(Collectors.toList());
             } else {
                 targetEntity = playerEntity;
-                toSlots = numbersBetween(0, totalSlotCount);
+                toSlots = IntStream.range(0, totalSlotCount).boxed().collect(Collectors.toList());
             }
 
             invManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
@@ -185,19 +163,14 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
                 EntityRef currentItem = invManager.getItemInSlot(playerEntity, currentSlot);
                 int currentItemCount = invManager.getStackSize(currentItem);
                 boolean correctItem = (currentItem == movingItemItem);
-                System.out.println("Current Item: " + currentItemCount);
-                System.out.println("Moving Item Item: " + movingItemCount);
 
-                if (correctItem && movingItemCount <= currentItemCount) {
-                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, movingItemCount);
-                    movingItemCount = 0;
-                } else if (correctItem) {
-                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, currentItemCount);
-                    movingItemCount -= currentItemCount;
+                if (correctItem) {
+                    int count = Math.min(movingItemCount, currentItemCount);
+                    invManager.moveItem(fromEntity, getTransferEntity(), currentSlot, targetEntity, 0, count);
+                    movingItemCount -= count;
                 }
 
                 currentSlot--;
-                System.out.println("Current slot: " + currentSlot);
             }
         }
 
