@@ -7,7 +7,7 @@
     "description": "This module adds a standard and simple inventory system as well as hooks for other modules",
     "dependencies": [
         {"id": "CoreAssets", "minVersion": "2.0.0", "optional": true},
-        {"id": "ModuleTestingEnvironment", "minVersion": "0.1.0", "optional": true}
+        {"id": "ModuleTestingEnvironment", "minVersion": "0.2.0-SNAPSHOT", "optional": true}
     ],
     "isLibrary": true,
     "isAugmentation": true
