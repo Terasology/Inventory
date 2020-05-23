@@ -18,10 +18,8 @@ package org.terasology.logic.inventory;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.reflection.MappedContainer;
 import org.terasology.world.block.Block;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -31,10 +29,10 @@ import java.util.List;
  * default value.
  * <p>
  * Stackable <em>items</em> may have a quantity greater than their maxStackSize and they will be split into multiple
- * stacks as required. However stackable <em>blocks</em> are limited to maximum stacks of 99, any excess
- * is ignored.</p>
- *
- * <p><strong>Note</strong> it is not possible to specify nested items (e.g. items in a chest).
+ * stacks as required. However stackable <em>blocks</em> are limited to maximum stacks of 99, any excess is
+ * ignored.</p>
+ * <p>
+ * It is also possible to specify nested items (e.g. items in a chest).
  * <p>
  * Example: add a delta for the player.prefab with the following
  * <pre>
@@ -42,8 +40,12 @@ import java.util.List;
  *   "StartingInventory": {
  *     "items": [
  *       { "uri": "CoreAssets:pickaxe" },
- *       { "uri": "CoreAssets:Torch", "quantity": 99 },
- *       { "uri": "CoreAdvancedAssets:chest", "quantity": 3 }
+ *       {
+ *          "uri": "CoreAdvancedAssets:chest",
+ *          "items": [
+ *              { "uri": "CoreAssets:Torch", "quantity": 99 },
+ *          ]
+ *       }
  *     ]
  *   }
  * }
@@ -69,9 +71,9 @@ public class StartingInventoryComponent implements Component {
 
         /**
          * A list of objects to be nested inside this inventory item.
-         *
-         * Adding inventory items to this list will cause a {@link InventoryComponent} to be added to this object.
-         * The nested inventory is filled with the items specified in this list.
+         * <p>
+         * Adding inventory items to this list will cause a {@link InventoryComponent} to be added to this object. The
+         * nested inventory is filled with the items specified in this list.
          */
         public List<InventoryItem> items = Lists.newLinkedList();
     }
