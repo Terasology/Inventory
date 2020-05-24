@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -32,6 +31,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,7 +63,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
                                     StartingInventoryComponent startingInventory) {
-        addNestedInventory(entityRef, startingInventory.items);
+        addItemsIfPossible(entityRef, startingInventory.items);
         entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
@@ -91,11 +91,16 @@ public class StartingInventorySystem extends BaseComponentSystem {
     private void addToInventory(EntityRef entityRef,
                                 StartingInventoryComponent.InventoryItem item) {
 
-        tryAsBlock(item)
-                .map(Optional::of)
-                .orElseGet(() -> tryAsItem(item))
-                .orElse(Lists.newArrayList())
-                .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
+        Optional<Supplier<EntityRef>> possibleItem =
+                resolveAsBlock(item).map(Optional::of).orElseGet(() -> resolveAsItem(item));
+
+        possibleItem.ifPresent(itemCreator -> {
+            Stream.generate(itemCreator)
+                    .limit(item.quantity)
+                    .peek(i -> addItemsIfPossible(i, item.items))
+                    .collect(Collectors.toList())
+                    .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
+        });
     }
 
     /**
@@ -109,7 +114,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param entity the entity to add the starting inventory objects to
      * @param items the objects to add to the entity's inventory
      */
-    private void addNestedInventory(EntityRef entity,
+    private void addItemsIfPossible(EntityRef entity,
                                     List<StartingInventoryComponent.InventoryItem> items) {
         if (entity.hasComponent(InventoryComponent.class)) {
             items.stream()
@@ -122,22 +127,28 @@ public class StartingInventorySystem extends BaseComponentSystem {
         }
     }
 
-    private Optional<List<EntityRef>> tryAsBlock(StartingInventoryComponent.InventoryItem item) {
-        return Optional.ofNullable(blockManager.getBlockFamily(item.uri))
-                .map(blockFamily ->
-                        Stream.generate(() -> blockFactory.newInstance(blockFamily))
-                                .limit(item.quantity)
-                                .peek(block -> addNestedInventory(block, item.items))
-                                .collect(Collectors.toList()));
+    /**
+     * Attempt to resolve the given item as block and yield a supplier for new block items.
+     *
+     * @param object the item to resolve as block item
+     * @return an optional supplier for block items if the item references a block family, empty otherwise
+     */
+    private Optional<Supplier<EntityRef>> resolveAsBlock(StartingInventoryComponent.InventoryItem object) {
+        return Optional.ofNullable(blockManager.getBlockFamily(object.uri))
+                .map(blockFamily -> () -> blockFactory.newInstance(blockFamily));
     }
 
-    private Optional<List<EntityRef>> tryAsItem(StartingInventoryComponent.InventoryItem item) {
-        return Optional.ofNullable(prefabManager.getPrefab(item.uri))
+    /**
+     * Attempt to resolve the given item as item prefab and yield a supplier to create new item instances.
+     * <p>
+     * The prefab the object URI resolves to must have an {@link ItemComponent}.
+     *
+     * @param object the item to resolve as item prefab
+     * @return an optional supplier for a prefab item if the object URI resolves to a prefab, empty otherwise
+     */
+    private Optional<Supplier<EntityRef>> resolveAsItem(StartingInventoryComponent.InventoryItem object) {
+        return Optional.ofNullable(prefabManager.getPrefab(object.uri))
                 .filter(prefab -> prefab.hasComponent(ItemComponent.class))
-                .map(prefab ->
-                        Stream.generate(() -> entityManager.create(item.uri))
-                                .limit(item.quantity)
-                                .peek(i -> addNestedInventory(i, item.items))
-                                .collect(Collectors.toList()));
+                .map(prefab -> () -> entityManager.create(object.uri));
     }
 }
