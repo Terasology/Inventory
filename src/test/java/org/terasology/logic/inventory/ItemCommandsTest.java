@@ -36,11 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Verify that adding blocks to an inventory is working as expected.
- * <p>
- * Dual test to {@link GiveItemTest}.
- *
- * @see GiveItemTest
+ * Verify that the {@link ItemCommands} are working as expected.
  */
 public class ItemCommandsTest {
 
