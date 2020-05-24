@@ -32,7 +32,6 @@ import org.terasology.world.block.items.BlockItemFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -95,7 +94,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
         //             This article describes the issue and provides the solution used here:
         //                  https://www.baeldung.com/java-optional-or-else-optional#1-lazy-evaluation
         final Optional<Supplier<EntityRef>> possibleItem =
-                resolveAsBlock(item).map(Optional::of).orElseGet(() -> resolveAsItem(item));
+                resolveAsBlock(item.uri).map(Optional::of).orElseGet(() -> resolveAsItem(item.uri));
 
         if (possibleItem.isPresent()) {
             Stream.generate(possibleItem.get())
@@ -132,27 +131,27 @@ public class StartingInventorySystem extends BaseComponentSystem {
     }
 
     /**
-     * Attempt to resolve the given item as block and yield a supplier for new block items.
+     * Attempt to resolve the given URI as block and yield a supplier for new block items.
      *
-     * @param object the item to resolve as block item
-     * @return an optional supplier for block items if the item references a block family, empty otherwise
+     * @param uri the URI to resolve as block item
+     * @return an optional supplier for block items if the URI references a block family, empty otherwise
      */
-    private Optional<Supplier<EntityRef>> resolveAsBlock(StartingInventoryComponent.InventoryItem object) {
-        return Optional.ofNullable(blockManager.getBlockFamily(object.uri))
+    private Optional<Supplier<EntityRef>> resolveAsBlock(final String uri) {
+        return Optional.ofNullable(blockManager.getBlockFamily(uri))
                 .map(blockFamily -> () -> blockFactory.newInstance(blockFamily));
     }
 
     /**
-     * Attempt to resolve the given item as item prefab and yield a supplier to create new item instances.
+     * Attempt to resolve the given URI as item prefab and yield a supplier to create new item instances.
      * <p>
      * The prefab the object URI resolves to must have an {@link ItemComponent}.
      *
-     * @param object the item to resolve as item prefab
-     * @return an optional supplier for a prefab item if the object URI resolves to a prefab, empty otherwise
+     * @param uri the URI to resolve as item prefab
+     * @return an optional supplier for a prefab item if the URI resolves to a prefab, empty otherwise
      */
-    private Optional<Supplier<EntityRef>> resolveAsItem(StartingInventoryComponent.InventoryItem object) {
-        return Optional.ofNullable(prefabManager.getPrefab(object.uri))
+    private Optional<Supplier<EntityRef>> resolveAsItem(String uri) {
+        return Optional.ofNullable(prefabManager.getPrefab(uri))
                 .filter(prefab -> prefab.hasComponent(ItemComponent.class))
-                .map(prefab -> () -> entityManager.create(object.uri));
+                .map(prefab -> () -> entityManager.create(uri));
     }
 }
