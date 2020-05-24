@@ -63,7 +63,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
                                     StartingInventoryComponent startingInventory) {
-        addItemsIfPossible(entityRef, startingInventory.items);
+        addItemsTo(startingInventory.items, entityRef);
         entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
@@ -91,16 +91,20 @@ public class StartingInventorySystem extends BaseComponentSystem {
     private void addToInventory(EntityRef entityRef,
                                 StartingInventoryComponent.InventoryItem item) {
 
-        Optional<Supplier<EntityRef>> possibleItem =
+        //TODO(Java9): Use Optional::or instead (https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html#or-java.util.function.Supplier-)
+        //             This article describes the issue and provides the solution used here:
+        //                  https://www.baeldung.com/java-optional-or-else-optional#1-lazy-evaluation
+        final Optional<Supplier<EntityRef>> possibleItem =
                 resolveAsBlock(item).map(Optional::of).orElseGet(() -> resolveAsItem(item));
 
-        possibleItem.ifPresent(itemCreator -> {
-            Stream.generate(itemCreator)
+        if (possibleItem.isPresent()) {
+            Stream.generate(possibleItem.get())
                     .limit(item.quantity)
-                    .peek(i -> addItemsIfPossible(i, item.items))
-                    .collect(Collectors.toList())
+                    .map(i -> addItemsTo(item.items, i))
                     .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
-        });
+        } else {
+            logger.warn("Could not resolve '{}' to either block or item.", item.uri);
+        }
     }
 
     /**
@@ -111,11 +115,10 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * If the list of nested items is empty or the entity does not have an inventory component this method does
      * nothing.
      *
-     * @param entity the entity to add the starting inventory objects to
      * @param items the objects to add to the entity's inventory
+     * @param entity the entity to add the starting inventory objects to
      */
-    private void addItemsIfPossible(EntityRef entity,
-                                    List<StartingInventoryComponent.InventoryItem> items) {
+    private EntityRef addItemsTo(List<StartingInventoryComponent.InventoryItem> items, EntityRef entity) {
         if (entity.hasComponent(InventoryComponent.class)) {
             items.stream()
                     .filter(this::isValid)
@@ -125,6 +128,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
                     "Cannot add starting inventory objects to entity without inventory component!\n{}",
                     entity.toFullDescription());
         }
+        return entity;
     }
 
     /**
