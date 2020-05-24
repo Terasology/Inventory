@@ -62,18 +62,8 @@ public class StartingInventorySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
-                                    StartingInventoryComponent startingInventoryComponent) {
-
-        InventoryComponent inventoryComponent =
-                Optional.ofNullable(entityRef.getComponent(InventoryComponent.class))
-                        .orElse(new InventoryComponent(40));
-        entityRef.addOrSaveComponent(inventoryComponent);
-
-        for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
-            if (validateItem(item)) {
-                addToInventory(entityRef, item, inventoryComponent);
-            }
-        }
+                                    StartingInventoryComponent startingInventory) {
+        addNestedInventory(entityRef, startingInventory.items);
         entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
@@ -85,7 +75,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param item the inventory item to validate
      * @return true if the item has non-empty URI and quantity greater zero, false otherwise
      */
-    private boolean validateItem(StartingInventoryComponent.InventoryItem item) {
+    private boolean isValid(StartingInventoryComponent.InventoryItem item) {
         if (item.uri == null || item.uri.isEmpty()) {
             logger.warn("Improperly specified starting inventory item: Uri is null");
             return false;
@@ -99,58 +89,55 @@ public class StartingInventorySystem extends BaseComponentSystem {
     }
 
     private void addToInventory(EntityRef entityRef,
-                                StartingInventoryComponent.InventoryItem item,
-                                InventoryComponent inventoryComponent) {
-        String uri = item.uri;
-        int quantity = item.quantity;
+                                StartingInventoryComponent.InventoryItem item) {
 
-        final List<EntityRef> objects =
-                tryAsBlock(uri, quantity, item.items)
-                        .map(Optional::of)
-                        .orElseGet(() -> tryAsItem(uri, quantity))
-                        .orElse(Lists.newArrayList());
-
-        objects.forEach(o ->
-                inventoryManager.giveItem(entityRef, EntityRef.NULL, o)
-        );
+        tryAsBlock(item)
+                .map(Optional::of)
+                .orElseGet(() -> tryAsItem(item))
+                .orElse(Lists.newArrayList())
+                .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
     }
 
     /**
-     * Adds an {@link InventoryComponent} to the given entity holding the specified items.
+     * Adds all valid objects to this entity if it has an item component.
+     * <p>
+     * Inventory objects are valid if {@link #isValid(StartingInventoryComponent.InventoryItem)} holds.
+     * <p>
+     * If the list of nested items is empty or the entity does not have an inventory component this method does
+     * nothing.
      *
-     * @param entity the entity that should hold the nested inventory
-     * @param items  items to be filled into the nested inventory
+     * @param entity the entity to add the starting inventory objects to
+     * @param items the objects to add to the entity's inventory
      */
     private void addNestedInventory(EntityRef entity,
                                     List<StartingInventoryComponent.InventoryItem> items) {
-        InventoryComponent nestedInventory =
-                Optional.ofNullable(entity.getComponent(InventoryComponent.class))
-                        .orElseGet(() -> new InventoryComponent(30));
-        entity.addOrSaveComponent(nestedInventory);
-        items.stream()
-                .filter(this::validateItem)
-                .forEach(i -> addToInventory(entity, i, nestedInventory));
+        if (entity.hasComponent(InventoryComponent.class)) {
+            items.stream()
+                    .filter(this::isValid)
+                    .forEach(item -> addToInventory(entity, item));
+        } else {
+            logger.warn(
+                    "Cannot add starting inventory objects to entity without inventory component!\n{}",
+                    entity.toFullDescription());
+        }
     }
 
-    private Optional<List<EntityRef>> tryAsBlock(String uri,
-                                                 int quantity,
-                                                 List<StartingInventoryComponent.InventoryItem> nestedItems) {
-        return Optional.ofNullable(blockManager.getBlockFamily(uri))
+    private Optional<List<EntityRef>> tryAsBlock(StartingInventoryComponent.InventoryItem item) {
+        return Optional.ofNullable(blockManager.getBlockFamily(item.uri))
                 .map(blockFamily ->
                         Stream.generate(() -> blockFactory.newInstance(blockFamily))
-                                .limit(quantity)
-                                .peek(block -> {
-                                    if (!nestedItems.isEmpty()) {
-                                        addNestedInventory(block, nestedItems);
-                                    }
-                                })
+                                .limit(item.quantity)
+                                .peek(block -> addNestedInventory(block, item.items))
                                 .collect(Collectors.toList()));
     }
 
-    private Optional<List<EntityRef>> tryAsItem(String uri,
-                                                int quantity) {
-        return Optional.ofNullable(prefabManager.getPrefab(uri))
-                .filter(p -> p.hasComponent(ItemComponent.class))
-                .map(p -> Stream.generate(() -> entityManager.create(uri)).limit(quantity).collect(Collectors.toList()));
+    private Optional<List<EntityRef>> tryAsItem(StartingInventoryComponent.InventoryItem item) {
+        return Optional.ofNullable(prefabManager.getPrefab(item.uri))
+                .filter(prefab -> prefab.hasComponent(ItemComponent.class))
+                .map(prefab ->
+                        Stream.generate(() -> entityManager.create(item.uri))
+                                .limit(item.quantity)
+                                .peek(i -> addNestedInventory(i, item.items))
+                                .collect(Collectors.toList()));
     }
 }
