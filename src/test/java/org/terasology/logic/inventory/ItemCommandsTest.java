@@ -26,6 +26,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
 import org.terasology.world.block.BlockManager;
@@ -42,7 +43,7 @@ public class ItemCommandsTest {
 
     static final String URI_DIRT = "CoreAssets:Dirt";
 
-    private static ModuleTestingEnvironment context;
+    private static ModuleTestingEnvironment mte;
 
     private Context hostContext;
     private EntityManager entityManager;
@@ -52,23 +53,23 @@ public class ItemCommandsTest {
 
     @BeforeAll
     public static void setup() throws Exception {
-        context = new ModuleTestingEnvironment() {
+        mte = new ModuleTestingEnvironment() {
             @Override
             public Set<String> getDependencies() {
                 return Sets.newHashSet("CoreAssets", "Inventory");
             }
         };
-        context.setup();
+        mte.setup();
     }
 
     @AfterAll
     public static void tearDown() throws Exception {
-        context.tearDown();
+        mte.tearDown();
     }
 
     @BeforeEach
     public void beforeEach() {
-        hostContext = context.getHostContext();
+        hostContext = mte.getHostContext();
         entityManager = hostContext.get(EntityManager.class);
         inventoryManager = hostContext.get(InventoryManager.class);
         blockManager = hostContext.get(BlockManager.class);
@@ -78,17 +79,23 @@ public class ItemCommandsTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 99, 100})
     public void giveItemSingleBlockStack(int amount) {
-        final EntityRef inventory = entityManager.create(new InventoryComponent(3));
+
+        Context clientContext = mte.createClient();
+        LocalPlayer localPlayer = clientContext.get(LocalPlayer.class);
+        final EntityRef player = localPlayer.getClientEntity();
+        final EntityRef character = localPlayer.getCharacterEntity();
+        character.upsertComponent(InventoryComponent.class, maybeInventory -> maybeInventory.orElse(new InventoryComponent(40)));
 
         final BlockItemFactory factory = new BlockItemFactory(entityManager);
         final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT), amount);
 
         Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'", EntityRef.NULL, blockItem);
 
-        itemCommands.give(inventory, URI_DIRT, amount, null);
+        //TODO: I don't know what to pass in there, whether it needs to be the player, character, or something else
+        itemCommands.give(player, URI_DIRT, amount, null);
 
         final List<EntityRef> filledSlots =
-                inventory.getComponent(InventoryComponent.class).itemSlots.stream()
+                character.getComponent(InventoryComponent.class).itemSlots.stream()
                         .filter(entityRef -> entityRef != EntityRef.NULL)
                         .collect(Collectors.toList());
 
