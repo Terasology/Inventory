@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -32,7 +31,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -62,18 +61,8 @@ public class StartingInventorySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef entityRef,
-                                    StartingInventoryComponent startingInventoryComponent) {
-
-        InventoryComponent inventoryComponent =
-                Optional.ofNullable(entityRef.getComponent(InventoryComponent.class))
-                        .orElse(new InventoryComponent(40));
-        entityRef.addOrSaveComponent(inventoryComponent);
-
-        for (StartingInventoryComponent.InventoryItem item : startingInventoryComponent.items) {
-            if (validateItem(item)) {
-                addToInventory(entityRef, item, inventoryComponent);
-            }
-        }
+                                    StartingInventoryComponent startingInventory) {
+        addItemsTo(startingInventory.items, entityRef);
         entityRef.removeComponent(StartingInventoryComponent.class);
     }
 
@@ -85,7 +74,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param item the inventory item to validate
      * @return true if the item has non-empty URI and quantity greater zero, false otherwise
      */
-    private boolean validateItem(StartingInventoryComponent.InventoryItem item) {
+    private boolean isValid(StartingInventoryComponent.InventoryItem item) {
         if (item.uri == null || item.uri.isEmpty()) {
             logger.warn("Improperly specified starting inventory item: Uri is null");
             return false;
@@ -99,58 +88,70 @@ public class StartingInventorySystem extends BaseComponentSystem {
     }
 
     private void addToInventory(EntityRef entityRef,
-                                StartingInventoryComponent.InventoryItem item,
-                                InventoryComponent inventoryComponent) {
-        String uri = item.uri;
-        int quantity = item.quantity;
+                                StartingInventoryComponent.InventoryItem item) {
 
-        final List<EntityRef> objects =
-                tryAsBlock(uri, quantity, item.items)
-                        .map(Optional::of)
-                        .orElseGet(() -> tryAsItem(uri, quantity))
-                        .orElse(Lists.newArrayList());
+        //TODO(Java9): Use Optional::or instead (https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html#or-java.util.function.Supplier-)
+        //             This article describes the issue and provides the solution used here:
+        //                  https://www.baeldung.com/java-optional-or-else-optional#1-lazy-evaluation
+        final Optional<Supplier<EntityRef>> possibleItem =
+                resolveAsBlock(item.uri).map(Optional::of).orElseGet(() -> resolveAsItem(item.uri));
 
-        objects.forEach(o ->
-                inventoryManager.giveItem(entityRef, EntityRef.NULL, o)
-        );
+        if (possibleItem.isPresent()) {
+            Stream.generate(possibleItem.get())
+                    .limit(item.quantity)
+                    .map(i -> addItemsTo(item.items, i))
+                    .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
+        } else {
+            logger.warn("Could not resolve '{}' to either block or item.", item.uri);
+        }
     }
 
     /**
-     * Adds an {@link InventoryComponent} to the given entity holding the specified items.
+     * Adds all valid objects to this entity if it has an item component.
+     * <p>
+     * Inventory objects are valid if {@link #isValid(StartingInventoryComponent.InventoryItem)} holds.
+     * <p>
+     * If the list of nested items is empty or the entity does not have an inventory component this method does
+     * nothing.
      *
-     * @param entity the entity that should hold the nested inventory
-     * @param items  items to be filled into the nested inventory
+     * @param items the objects to add to the entity's inventory
+     * @param entity the entity to add the starting inventory objects to
      */
-    private void addNestedInventory(EntityRef entity,
-                                    List<StartingInventoryComponent.InventoryItem> items) {
-        InventoryComponent nestedInventory =
-                Optional.ofNullable(entity.getComponent(InventoryComponent.class))
-                        .orElseGet(() -> new InventoryComponent(30));
-        entity.addOrSaveComponent(nestedInventory);
-        items.stream()
-                .filter(this::validateItem)
-                .forEach(i -> addToInventory(entity, i, nestedInventory));
+    private EntityRef addItemsTo(List<StartingInventoryComponent.InventoryItem> items, EntityRef entity) {
+        if (entity.hasComponent(InventoryComponent.class)) {
+            items.stream()
+                    .filter(this::isValid)
+                    .forEach(item -> addToInventory(entity, item));
+        } else {
+            logger.warn(
+                    "Cannot add starting inventory objects to entity without inventory component!\n{}",
+                    entity.toFullDescription());
+        }
+        return entity;
     }
 
-    private Optional<List<EntityRef>> tryAsBlock(String uri,
-                                                 int quantity,
-                                                 List<StartingInventoryComponent.InventoryItem> nestedItems) {
+    /**
+     * Attempt to resolve the given URI as block and yield a supplier for new block items.
+     *
+     * @param uri the URI to resolve as block item
+     * @return an optional supplier for block items if the URI references a block family, empty otherwise
+     */
+    private Optional<Supplier<EntityRef>> resolveAsBlock(final String uri) {
         return Optional.ofNullable(blockManager.getBlockFamily(uri))
-                .map(blockFamily ->
-                        Stream.generate(() -> blockFactory.newInstance(blockFamily))
-                                .limit(quantity)
-                                .peek(block -> {
-                                    if (!nestedItems.isEmpty()) {
-                                        addNestedInventory(block, nestedItems);
-                                    }
-                                })
-                                .collect(Collectors.toList()));
+                .map(blockFamily -> () -> blockFactory.newInstance(blockFamily));
     }
 
-    private Optional<List<EntityRef>> tryAsItem(String uri,
-                                                int quantity) {
+    /**
+     * Attempt to resolve the given URI as item prefab and yield a supplier to create new item instances.
+     * <p>
+     * The prefab the object URI resolves to must have an {@link ItemComponent}.
+     *
+     * @param uri the URI to resolve as item prefab
+     * @return an optional supplier for a prefab item if the URI resolves to a prefab, empty otherwise
+     */
+    private Optional<Supplier<EntityRef>> resolveAsItem(String uri) {
         return Optional.ofNullable(prefabManager.getPrefab(uri))
-                .filter(p -> p.hasComponent(ItemComponent.class))
-                .map(p -> Stream.generate(() -> entityManager.create(uri)).limit(quantity).collect(Collectors.toList()));
+                .filter(prefab -> prefab.hasComponent(ItemComponent.class))
+                .map(prefab -> () -> entityManager.create(uri));
     }
 }
