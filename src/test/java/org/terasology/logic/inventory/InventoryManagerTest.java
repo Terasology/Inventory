@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.terasology.context.Context;
@@ -35,8 +36,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InventoryManagerTest {
-
-    static final String URI_DIRT = "CoreAssets:Dirt";
 
     private static ModuleTestingEnvironment context;
 
@@ -74,9 +73,9 @@ public class InventoryManagerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(bytes = {0, -1})
+    @ValueSource(ints = {0, -1})
     public void giveItem_zeroBlocks(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
+        EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
@@ -84,9 +83,19 @@ public class InventoryManagerTest {
     }
 
     @ParameterizedTest
+    @ValueSource(bytes = {0, -1})
+    public void giveItem_zeroItems(byte amount) {
+        EntityRef item = getPrefabItem(entityManager, amount, false);
+        inventoryManager.giveItem(inventory, EntityRef.NULL, item);
+
+        final List<EntityRef> filledSlots = getFilledSlots(inventory);
+        Assert.assertEquals("No slots should be filled", 0, filledSlots.size());
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = {1, 99})
-    public void giveItem_singleStack(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
+    public void giveItem_blockStack(int amount) {
+        EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
@@ -100,15 +109,23 @@ public class InventoryManagerTest {
         });
     }
 
+    @Test
+    public void giveItem_nonStackableItem() {
+        EntityRef singleItem = getPrefabItem(entityManager, (byte) 1, false);
+        inventoryManager.giveItem(inventory, EntityRef.NULL, singleItem);
+
+        final List<EntityRef> filledSlots = getFilledSlots(inventory);
+        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
+        filledSlots.forEach(slot -> {
+            Assert.assertEquals("Slot should contain exactly the stackable item", singleItem, slot);
+            Assert.assertEquals("Unexpected stack count!", 1, slot.getComponent(ItemComponent.class).stackCount);
+        });
+    }
+
     @ParameterizedTest
     @ValueSource(bytes = {1, 2, 99})
     public void giveItem_stackableItem(byte amount) {
-        final EntityRef stackedItem = entityManager.create("CoreAssets:Axe");
-        stackedItem.updateComponent(ItemComponent.class, component -> {
-            component.stackId = "CoreAssets:Axe"; // make the core axe stackable for this test
-            component.stackCount = amount;
-            return component;
-        });
+        final EntityRef stackedItem = getPrefabItem(entityManager, amount, true);
 
         Assert.assertFalse(stackedItem.getComponent(ItemComponent.class).stackId.isEmpty());
 
@@ -125,13 +142,27 @@ public class InventoryManagerTest {
         });
     }
 
-    private static EntityRef getDirtBlockItem(EntityManager entityManager, BlockManager blockManager, int amount) {
+    private static EntityRef getBlockItem(EntityManager entityManager, BlockManager blockManager, int amount) {
+        final String uri = "CoreAssets:Dirt";
         final BlockItemFactory factory = new BlockItemFactory(entityManager);
-        final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT), amount);
+        final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(uri), amount);
 
-        Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'",
+        Assert.assertNotEquals("Cannot create a block item instance for '" + uri + "'",
                 EntityRef.NULL, blockItem);
         return blockItem;
+    }
+
+    private static EntityRef getPrefabItem(EntityManager entityManager, byte amount, boolean stackable) {
+        final String uri = "CoreAssets:Axe";
+        final EntityRef item = entityManager.create(uri);
+        item.updateComponent(ItemComponent.class, component -> {
+            component.stackCount = amount;
+            if (stackable) {
+                component.stackId = uri;
+            }
+            return component;
+        });
+        return item;
     }
 
     private static List<EntityRef> getFilledSlots(EntityRef inventory) {
