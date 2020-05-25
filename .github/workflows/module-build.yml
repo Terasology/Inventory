@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build / Test / Publish
+    name: Build / Test / Static Analysis
       runs-on: ubuntu-latest
       steps:
         - name: Checkout Engine
@@ -40,19 +40,10 @@ jobs:
             java-version: 8
         - name: Refresh Module Build Files
           run: ./groovyw module refresh
-        - name: Get module version
-          run: echo ::set-env name=MODULE_VERSION::$(./gradlew :modules:${{ github.event.repository.name }}:properties | grep "version:" | awk '{print $2}')
-          shell: bash
         - name: Build module JAR
           run: ./gradlew :modules:${{ github.event.repository.name }}:jar
-        - name: Test
+        - name: Tests
           run: ./gradlew :modules:${{ github.event.repository.name }}:test
-        - name: Check
-          run: ./gradlew :modules:${{ github.event.repository.name }}:check
+        - name: Static Code Analysis
+          run: ./gradlew :modules:${{ github.event.repository.name }}:check -x test
           continue-on-error: true
-        - name: Upload Build Artifact
-          uses: actions/upload-artifact@v2
-          with:
-            name: ${{ github.event.repository.name }}-${{ env.MODULE_VERSION }}.jar
-            path: modules/${{ github.event.repository.name }}/build/libs/${{ github.event.repository.name }}-${{ env.MODULE_VERSION }}.jar
-            shell: bash
