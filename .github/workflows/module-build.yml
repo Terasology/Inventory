@@ -1,4 +1,4 @@
-name: Build, Test, and Upload Artifacts
+name: Build, Test, and run Static Code Analysis
 
 on:
   push:
