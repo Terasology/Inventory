@@ -17,8 +17,8 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.collect.Sets;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,7 @@ public class InventoryManagerTest {
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("No slots should be filled", 0, filledSlots.size());
+        Assertions.assertEquals(0, filledSlots.size(), "No slots should be filled");
     }
 
     @ParameterizedTest
@@ -88,7 +88,7 @@ public class InventoryManagerTest {
         inventoryManager.giveItem(inventory, EntityRef.NULL, item);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("No slots should be filled", 0, filledSlots.size());
+        Assertions.assertEquals(0, filledSlots.size(), "No slots should be filled");
     }
 
     @ParameterizedTest
@@ -98,13 +98,10 @@ public class InventoryManagerTest {
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
         filledSlots.forEach(item -> {
-            Assert.assertEquals("Slot should contain exactly the added block", blockItem, item);
-
-            final int maxStackSize = blockItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be " + amount + " or maximum stack size",
-                    Math.min(amount, maxStackSize), item.getComponent(ItemComponent.class).stackCount);
+            Assertions.assertEquals(blockItem, item, "Slot should contain exactly the added block");
+            Assertions.assertEquals(amount, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
@@ -114,10 +111,10 @@ public class InventoryManagerTest {
         inventoryManager.giveItem(inventory, EntityRef.NULL, singleItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the stackable item", singleItem, slot);
-            Assert.assertEquals("Unexpected stack count!", 1, slot.getComponent(ItemComponent.class).stackCount);
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
+        filledSlots.forEach(item -> {
+            Assertions.assertEquals(singleItem, item, "Slot should contain exactly the non-stackable item");
+            Assertions.assertEquals(1, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
@@ -126,18 +123,13 @@ public class InventoryManagerTest {
     public void giveItem_stackableItem(byte amount) {
         final EntityRef stackedItem = getPrefabItem(entityManager, amount, true);
 
-        Assert.assertFalse(stackedItem.getComponent(ItemComponent.class).stackId.isEmpty());
-
         inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the stackable item", stackedItem, slot);
-
-            final int maxStackSize = stackedItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Unexpected stack count!",
-                    Math.min(amount, maxStackSize), slot.getComponent(ItemComponent.class).stackCount);
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
+        filledSlots.forEach(item -> {
+            Assertions.assertEquals(stackedItem, item, "Slot should contain exactly the stackable item");
+            Assertions.assertEquals(amount, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
@@ -146,8 +138,8 @@ public class InventoryManagerTest {
         final BlockItemFactory factory = new BlockItemFactory(entityManager);
         final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(uri), amount);
 
-        Assert.assertNotEquals("Cannot create a block item instance for '" + uri + "'",
-                EntityRef.NULL, blockItem);
+        Assertions.assertNotEquals(EntityRef.NULL, blockItem,
+                "Cannot create a block item instance for '" + uri + "'");
         return blockItem;
     }
 
