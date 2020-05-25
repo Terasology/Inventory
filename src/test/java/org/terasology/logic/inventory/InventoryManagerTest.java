@@ -101,48 +101,6 @@ public class InventoryManagerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {100, 128, 256})
-    public void giveItem_blockExceedingStacksize(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
-        inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
-
-        final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(item -> {
-            Assert.assertEquals("Slot should contain exactly the added block", blockItem, item);
-
-            final int maxStackSize = blockItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be capped at maximum stack size",
-                    Math.min(amount, maxStackSize), item.getComponent(ItemComponent.class).stackCount);
-        });
-    }
-
-    @ParameterizedTest
-    @ValueSource(bytes = {1, 2})
-    public void giveItem_nonStackableItem(byte amount) {
-        final EntityRef originalItem = entityManager.create("CoreAssets:Axe");
-        originalItem.updateComponent(ItemComponent.class, component -> {
-            component.stackCount = amount;
-            return component;
-        });
-
-        Assert.assertTrue(originalItem.getComponent(ItemComponent.class).stackId.isEmpty());
-
-        inventoryManager.giveItem(inventory, EntityRef.NULL, originalItem);
-
-        final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the non-stackable item", originalItem, slot);
-
-            final int maxStackSize = originalItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Unexpected stack count",
-                    1, slot.getComponent(ItemComponent.class).stackCount);
-
-        });
-    }
-
-    @ParameterizedTest
     @ValueSource(bytes = {1, 2, 99})
     public void giveItem_stackableItem(byte amount) {
         final EntityRef stackedItem = entityManager.create("CoreAssets:Axe");
@@ -163,29 +121,6 @@ public class InventoryManagerTest {
 
             final int maxStackSize = stackedItem.getComponent(ItemComponent.class).maxStackSize;
             Assert.assertEquals("Unexpected stack count!",
-                    Math.min(amount, maxStackSize), slot.getComponent(ItemComponent.class).stackCount);
-        });
-    }
-
-    @ParameterizedTest
-    @ValueSource(bytes = {100, 127})
-    public void giveItem_stackableItemExceedingStackSize(byte amount) {
-        final EntityRef stackedItem = entityManager.create("CoreAssets:Axe");
-        stackedItem.updateComponent(ItemComponent.class, component -> {
-            component.stackId = "CoreAssets:Axe"; // make the core axe stackable for this test
-            component.stackCount = amount;
-            return component;
-        });
-
-        inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
-
-        final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the non-stackable item", stackedItem, slot);
-
-            final int maxStackSize = stackedItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be capped at maximum stack size",
                     Math.min(amount, maxStackSize), slot.getComponent(ItemComponent.class).stackCount);
         });
     }
