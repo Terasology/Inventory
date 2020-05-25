@@ -37,9 +37,8 @@ import java.util.stream.Collectors;
 
 public class InventoryManagerTest {
 
-    private static ModuleTestingEnvironment context;
+    private static ModuleTestingEnvironment mte;
 
-    private Context hostContext;
     private EntityManager entityManager;
     private InventoryManager inventoryManager;
     private BlockManager blockManager;
@@ -47,23 +46,23 @@ public class InventoryManagerTest {
 
     @BeforeAll
     public static void setup() throws Exception {
-        context = new ModuleTestingEnvironment() {
+        mte = new ModuleTestingEnvironment() {
             @Override
             public Set<String> getDependencies() {
                 return Sets.newHashSet("CoreAssets", "Inventory");
             }
         };
-        context.setup();
+        mte.setup();
     }
 
     @AfterAll
     public static void tearDown() throws Exception {
-        context.tearDown();
+        mte.tearDown();
     }
 
     @BeforeEach
     public void beforeEach() {
-        hostContext = context.getHostContext();
+        Context hostContext = mte.getHostContext();
 
         entityManager = hostContext.get(EntityManager.class);
         inventoryManager = hostContext.get(InventoryManager.class);
