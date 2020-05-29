@@ -24,14 +24,15 @@ import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.world.block.ForceBlockActive;
+import org.terasology.world.block.items.AddToBlockBasedItem;
 
 import java.util.List;
 
 /**
  * Allows an entity to store items.
- *
  */
 @ForceBlockActive
+@AddToBlockBasedItem
 public final class InventoryComponent implements Component, ReplicationCheck {
 
     public boolean privateToOwner = true;
