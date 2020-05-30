@@ -56,7 +56,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
     BlockItemFactory blockFactory;
 
     /**
-     * Collect entities without inventory component, which had nested items in the {@link StartingInventoryComponent}.
+     * Collect entities without inventory component, which have nested items configured in the {@link StartingInventoryComponent}.
      */
     private final Set<String> entitiesWithoutInventory = Sets.newHashSet();
 
