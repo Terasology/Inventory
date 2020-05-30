@@ -82,8 +82,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      */
     private void logErrors() {
         if (!entitiesWithoutInventory.isEmpty()) {
-            logger.warn("Cannot add starting inventory objects to entities without inventory component!");
-            entitiesWithoutInventory.forEach(logger::warn);
+            logger.warn("Cannot add starting inventory objects to entities without inventory component!\n{}", entitiesWithoutInventory);
             entitiesWithoutInventory.clear();
         }
     }
@@ -127,7 +126,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
         //             This article describes the issue and provides the solution used here:
         //                  https://www.baeldung.com/java-optional-or-else-optional#1-lazy-evaluation
         final Optional<Supplier<EntityRef>> possibleItem =
-                resolveAsBlock(item.uri).map(Optional::of).orElseGet(() -> resolveAsItem(item.uri));
+                resolveAsItem(item.uri).map(Optional::of).orElseGet(() -> resolveAsBlock(item.uri));
 
         if (possibleItem.isPresent()) {
             Stream.generate(possibleItem.get())
