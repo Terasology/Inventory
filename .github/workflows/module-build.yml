@@ -47,7 +47,7 @@ jobs:
       - name: Tests
         run: ./gradlew :modules:${{ github.event.repository.name }}:test --console=plain
       - name: check-run-reporter
-        uses: check-run-reporter/action@457f27bf6e0b568b90ba58c377a23564e43db99c
+        uses: check-run-reporter/action@master
         env:
           CHECK_RUN_REPORTER_LABEL: 'Unit Tests'
           CHECK_RUN_REPORTER_REPORT: 'modules/${{ github.event.repository.name }}/build/test-results/test/*.xml'
