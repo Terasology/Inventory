@@ -49,6 +49,7 @@ jobs:
       - name: check-run-reporter
         uses: check-run-reporter/action@extra-logging
         env:
+          CHECK_RUN_REPORTER_ROOT: 'modules/${{ github.event.repository.name }}'
           CHECK_RUN_REPORTER_LABEL: 'Unit Tests'
           CHECK_RUN_REPORTER_REPORT: 'modules/${{ github.event.repository.name }}/build/test-results/test/*.xml'
           CHECK_RUN_REPORTER_TOKEN: ${{ secrets.CHECK_RUN_REPORTER_TOKEN }}
