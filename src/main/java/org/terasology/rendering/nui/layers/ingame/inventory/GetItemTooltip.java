@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.rendering.nui.widgets.TooltipLine;
+import org.terasology.nui.widgets.TooltipLine;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -18,9 +18,9 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 /**
  */
