@@ -26,9 +26,9 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 import java.util.ArrayList;
 import java.util.List;
