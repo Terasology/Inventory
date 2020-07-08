@@ -20,6 +20,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
@@ -36,7 +38,8 @@ public class InventoryHud extends CoreHudWidget {
     @Override
     public void initialise() {
         for (InventoryCell cell : findAll(InventoryCell.class)) {
-            cell.bindSelected(new SlotSelectedBinding(cell.getTargetSlot(), localPlayer));
+//            cell.bindSelected(new SlotSelectedBinding(cell.getTargetSlot(), localPlayer));
+            cell.bindTargetSlot(new TargetSlotBinding(cell.getTargetSlot(), localPlayer));
             cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
                 @Override
                 public EntityRef get() {
@@ -67,6 +70,30 @@ public class InventoryHud extends CoreHudWidget {
         public Boolean get() {
             SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             return component != null && component.slot == slot;
+        }
+    }
+
+    private class TargetSlotBinding implements Binding<Integer> {
+
+        private int offset;
+        private LocalPlayer localPlayer;
+
+        public TargetSlotBinding(int targetSlot, LocalPlayer localPlayer) {
+            this.offset = targetSlot;
+            this.localPlayer = localPlayer;
+        }
+
+        @Override
+        public Integer get() {
+            SelectedInventorySlotComponent component =
+                    localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
+            return (component.slot + offset) % 10;
+            //return null;
+        }
+
+        @Override
+        public void set(Integer value) {
+
         }
     }
 }
