@@ -35,11 +35,19 @@ public class InventoryHud extends CoreHudWidget {
 
     private UICrosshair crosshair;
 
+    // Set "true" to use the rotating style quickslot; set "false" to get the default style quickslot
+    @LayoutConfig
+    private boolean rotateItems = true;
+
     @Override
     public void initialise() {
         for (InventoryCell cell : findAll(InventoryCell.class)) {
-//            cell.bindSelected(new SlotSelectedBinding(cell.getTargetSlot(), localPlayer));
-            cell.bindTargetSlot(new TargetSlotBinding(cell.getTargetSlot(), localPlayer));
+            int offset = cell.getTargetSlot();
+            if (rotateItems) {
+                cell.bindTargetSlot(new TargetSlotBinding(offset, localPlayer));
+            } else {
+                cell.bindSelected(new SlotSelectedBinding(offset, localPlayer));
+            }
             cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
                 @Override
                 public EntityRef get() {
