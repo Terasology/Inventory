@@ -37,7 +37,7 @@ public class InventoryHud extends CoreHudWidget {
 
     // Set "true" to use the rotating style quickslot; set "false" to get the default style quickslot
     @LayoutConfig
-    private boolean rotateItems = true;
+    private boolean rotateItems = false;
 
     @Override
     public void initialise() {
