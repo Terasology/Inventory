@@ -96,7 +96,6 @@ public class InventoryHud extends CoreHudWidget {
             SelectedInventorySlotComponent component =
                     localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             return (component.slot + offset) % 10;
-            //return null;
         }
 
         @Override
