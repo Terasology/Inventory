@@ -21,7 +21,6 @@ import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
@@ -81,7 +80,7 @@ public class InventoryHud extends CoreHudWidget {
         }
     }
 
-    private class TargetSlotBinding implements Binding<Integer> {
+    private class TargetSlotBinding extends ReadOnlyBinding<Integer> {
 
         private int offset;
         private LocalPlayer localPlayer;
@@ -96,11 +95,6 @@ public class InventoryHud extends CoreHudWidget {
             SelectedInventorySlotComponent component =
                     localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             return (component.slot + offset) % 10;
-        }
-
-        @Override
-        public void set(Integer value) {
-
         }
     }
 }
