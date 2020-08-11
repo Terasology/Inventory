@@ -17,6 +17,8 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.joml.Vector2i;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.utilities.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
@@ -40,6 +42,7 @@ import java.util.Optional;
  */
 public abstract class ItemCell extends CoreWidget {
     protected ItemIcon icon = new ItemIcon();
+    @LayoutConfig
     private Binding<Boolean> selected = new DefaultBinding<>(false);
 
     public ItemCell() {
