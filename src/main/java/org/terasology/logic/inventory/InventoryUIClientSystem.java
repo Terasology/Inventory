@@ -30,8 +30,8 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.nui.ControlWidget;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
 
 import java.util.ArrayList;

@@ -19,9 +19,9 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
 public class InventoryHud extends CoreHudWidget {
