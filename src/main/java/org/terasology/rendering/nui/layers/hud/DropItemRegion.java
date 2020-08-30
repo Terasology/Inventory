@@ -21,6 +21,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
@@ -62,8 +63,8 @@ public class DropItemRegion extends CoreHudWidget {
                 //send DropItemRequest
                 Vector3f impulseVector = new Vector3f(direction);
                 playerEntity.send(new DropItemRequest(item, playerEntity,
-                        impulseVector,
-                        newPosition,
+                        JomlUtil.from(impulseVector),
+                        JomlUtil.from(newPosition),
                         count));
                 return true;
             }

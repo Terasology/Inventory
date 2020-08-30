@@ -25,6 +25,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.registry.In;
@@ -136,8 +137,8 @@ public class InventoryScreen extends CoreScreenLayer {
         //send DropItemRequest
         Vector3f impulseVector = new Vector3f(direction);
         playerEntity.send(new DropItemRequest(item, playerEntity,
-                impulseVector,
-                newPosition,
+                JomlUtil.from(impulseVector),
+                JomlUtil.from(newPosition),
                 count));
     }
 }
