@@ -11,7 +11,7 @@ import org.terasology.engine.network.Replicate;
 import org.terasology.engine.network.ReplicationCheck;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.engine.world.block.items.AddToBlockBasedItem;
-import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.nui.reflection.metadata.FieldMetadata;
 
 import java.util.List;
 
