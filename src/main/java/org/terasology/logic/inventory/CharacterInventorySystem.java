@@ -131,7 +131,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             pickupItem.saveComponent(pickupComponent);
         }
 
-        pickupItem.send(new ImpulseEvent(JomlUtil.from(event.getImpulse())));
+        pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
     @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
