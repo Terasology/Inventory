@@ -25,11 +25,11 @@ import org.terasology.nui.CoreWidget;
 import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.LayoutConfig;
 import org.terasology.nui.widgets.TooltipLine;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.items.BlockItemComponent;
 
