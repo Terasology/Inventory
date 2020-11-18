@@ -21,12 +21,13 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.JomlUtil;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
 /**
  * A region/layer around the inventory grid to allow players to get rid of extra items
@@ -62,8 +63,8 @@ public class DropItemRegion extends CoreHudWidget {
                 //send DropItemRequest
                 Vector3f impulseVector = new Vector3f(direction);
                 playerEntity.send(new DropItemRequest(item, playerEntity,
-                        impulseVector,
-                        newPosition,
+                        JomlUtil.from(impulseVector),
+                        JomlUtil.from(newPosition),
                         count));
                 return true;
             }

@@ -16,11 +16,7 @@
 
 package org.terasology.logic.inventory;
 
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.utilities.Assets;
+import org.joml.Vector3f;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -37,6 +33,7 @@ import org.terasology.input.binds.inventory.ToolbarSlotButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.events.ChangeHeldItemRequest;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.DropItemRequest;
@@ -44,12 +41,16 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
+import org.terasology.math.JomlUtil;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.hud.InventoryHud;
+import org.terasology.utilities.Assets;
 
 @RegisterSystem
 public class CharacterInventorySystem extends BaseComponentSystem {
@@ -122,7 +123,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             }
         }
 
-        pickupItem.send(new DropItemEvent(event.getNewPosition()));
+        pickupItem.send(new DropItemEvent(JomlUtil.from(event.getNewPosition())));
 
         if (pickupItem.hasComponent(PickupComponent.class)) {
             PickupComponent pickupComponent = pickupItem.getComponent(PickupComponent.class);
@@ -181,8 +182,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             // Compute new position
             dropPower *= 150f;
 
-            Vector3f position = localPlayer.getViewPosition();
-            Vector3f direction = localPlayer.getViewDirection();
+            Vector3f position = JomlUtil.from(localPlayer.getViewPosition());
+            Vector3f direction = JomlUtil.from(localPlayer.getViewDirection());
 
             Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
             HitResult hitResult = physics.rayTrace(position, direction, 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
@@ -196,7 +197,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(direction);
-            impulseVector.scale(dropPower);
+            impulseVector.mul(dropPower);
             entity.send(new DropItemRequest(selectedItemEntity, entity,
                     impulseVector,
                     newPosition));

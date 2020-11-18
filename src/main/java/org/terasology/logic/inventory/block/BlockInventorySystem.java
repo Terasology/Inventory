@@ -80,7 +80,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
             if (itemInSlot.exists()) {
                 inventoryManager.removeItem(entity, entity, itemInSlot, false);
                 itemInSlot.send(new DropItemEvent(position));
-                itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f, new org.joml.Vector3f())));
             }
         }
     }
