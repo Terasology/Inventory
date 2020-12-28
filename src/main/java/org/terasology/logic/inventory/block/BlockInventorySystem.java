@@ -1,20 +1,8 @@
-/*
- * Copyright 2014 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 package org.terasology.logic.inventory.block;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -28,7 +16,6 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -70,8 +57,8 @@ public class BlockInventorySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = {InventoryComponent.class, DropBlockInventoryComponent.class, LocationComponent.class})
-    public void dropContentsOfInventory(DoDestroyEvent event, EntityRef entity) {
-        Vector3f position = entity.getComponent(LocationComponent.class).getWorldPosition();
+    public void dropContentsOfInventory(DoDestroyEvent event, EntityRef entity, LocationComponent location) {
+        Vector3f position = location.getWorldPosition(new Vector3f());
 
         FastRandom random = new FastRandom();
         int slotCount = InventoryUtils.getSlotCount(entity);
@@ -80,7 +67,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
             if (itemInSlot.exists()) {
                 inventoryManager.removeItem(entity, entity, itemInSlot, false);
                 itemInSlot.send(new DropItemEvent(position));
-                itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f, new org.joml.Vector3f())));
+                itemInSlot.send(new ImpulseEvent(random.nextVector3f(30.0f, new Vector3f())));
             }
         }
     }
