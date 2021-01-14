@@ -23,10 +23,7 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -114,31 +111,9 @@ public class InventoryScreen extends CoreScreenLayer {
 
         inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
 
-
-
-        /*
-         The code below was taken from the InteractionListener in the
-         DropItemRegion.class and slightly modified to work here.
-
-         The code to drop an item right in front of the player that
-         was in that class was almost exactly what was needed here.
-        */
         EntityRef item = InventoryUtils.getItemAt(movingItem, 0);
-
         int count = InventoryUtils.getStackCount(item);
 
-        Vector3f position = localPlayer.getViewPosition();
-        Vector3f direction = localPlayer.getViewDirection();
-        Vector3f newPosition = new Vector3f(position.x + direction.x * 1.5f,
-                position.y + direction.y * 1.5f,
-                position.z + direction.z * 1.5f
-        );
-
-        //send DropItemRequest
-        Vector3f impulseVector = new Vector3f(direction);
-        playerEntity.send(new DropItemRequest(item, playerEntity,
-                JomlUtil.from(impulseVector),
-                JomlUtil.from(newPosition),
-                count));
+        InventoryUtils.dropItems(item, count, localPlayer);
     }
 }

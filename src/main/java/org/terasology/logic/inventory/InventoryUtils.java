@@ -15,13 +15,16 @@
  */
 package org.terasology.logic.inventory;
 
+import org.joml.Vector3f;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
+import org.terasology.logic.players.LocalPlayer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -443,4 +446,25 @@ public final class InventoryUtils {
         entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
     }
 
+    /**
+     * Send a {@link DropItemRequest} to the player entity to drop the specified amount of items, configured with common
+     * values for the position and impulse vectors.
+     *
+     * @param item the item type to drop from the player's inventory
+     * @param count the number of items to drop
+     * @param localPlayer the local player to drop the items from
+     */
+    public static void dropItems(EntityRef item, int count, LocalPlayer localPlayer) {
+        EntityRef playerEntity = localPlayer.getCharacterEntity();
+
+        Vector3f position = localPlayer.getViewPosition(new Vector3f());
+        Vector3f direction = localPlayer.getViewDirection(new Vector3f());
+        Vector3f newPosition = position.add(direction.mul(1.5f, 1.5f, 1.5f, new Vector3f()));
+
+        Vector3f impulseVector = new Vector3f(direction);
+        playerEntity.send(new DropItemRequest(item, playerEntity,
+                impulseVector,
+                newPosition,
+                count));
+    }
 }

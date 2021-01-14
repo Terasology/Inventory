@@ -19,10 +19,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.logic.inventory.events.DropItemRequest;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.JomlUtil;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
@@ -54,18 +51,7 @@ public class DropItemRegion extends CoreHudWidget {
                     count = InventoryUtils.getStackCount(item);     //Drop complete stack with left click
                 }
 
-                Vector3f position = localPlayer.getViewPosition();
-                Vector3f direction = localPlayer.getViewDirection();
-                Vector3f newPosition = new Vector3f(position.x + direction.x * 1.5f,
-                        position.y + direction.y * 1.5f,
-                        position.z + direction.z * 1.5f
-                );
-                //send DropItemRequest
-                Vector3f impulseVector = new Vector3f(direction);
-                playerEntity.send(new DropItemRequest(item, playerEntity,
-                        JomlUtil.from(impulseVector),
-                        JomlUtil.from(newPosition),
-                        count));
+                InventoryUtils.dropItems(item, count, localPlayer);
                 return true;
             }
             return false;
