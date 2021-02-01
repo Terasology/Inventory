@@ -17,6 +17,7 @@
 package org.terasology.logic.inventory.events;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
@@ -36,15 +37,15 @@ public class DropItemRequest implements Event {
     protected DropItemRequest() {
     }
 
-    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition, int count) {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3fc impulse, Vector3fc newPosition, int count) {
         this.item = usedItem;
         this.inventory = inventoryEntity;
-        this.impulse = impulse;
-        this.newPosition = newPosition;
+        this.impulse = new Vector3f(impulse);
+        this.newPosition = new Vector3f(newPosition);
         this.count = count;
     }
 
-    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition) {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3fc impulse, Vector3fc newPosition) {
         this(usedItem, inventoryEntity, impulse, newPosition, 1);
     }
 
