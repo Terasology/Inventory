@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
+import org.joml.Quaternionf;
 import org.joml.Vector2i;
-import org.terasology.math.JomlUtil;
+import org.joml.Vector3f;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -70,10 +70,10 @@ public class ItemIcon extends CoreWidget {
         if (getIcon() != null) {
             canvas.drawTexture(getIcon());
         } else if (getMesh() != null && getMeshTexture() != null) {
-            Quat4f rotation = new Quat4f(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
+            Quaternionf rotation = new Quaternionf().rotationYXZ(TeraMath.PI / 6, -TeraMath.PI / 12, 0);
             CanvasUtility.drawMesh(
-                    canvas, getMesh(), getMeshTexture(), JomlUtil.from(canvas.getRegion()), rotation,
-                    org.terasology.math.geom.Vector3f.zero(), 1f
+                canvas, getMesh(), getMeshTexture(), canvas.getRegion(), rotation,
+                new Vector3f(), 1f
             );
         }
         if (getQuantity() > 1) {
