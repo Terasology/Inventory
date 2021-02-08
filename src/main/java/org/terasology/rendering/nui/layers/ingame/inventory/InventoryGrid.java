@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import org.joml.Vector2i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.math.JomlUtil;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
@@ -127,8 +127,8 @@ public class InventoryGrid extends CoreWidget {
         for (int i = 0; i < numSlots && i < cells.size(); ++i) {
             int horizPos = i % horizontalCells;
             int vertPos = i / horizontalCells;
-            canvas.drawWidget(cells.get(i), JomlUtil.rectangleiFromMinAndSize(
-                    horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y)
+            canvas.drawWidget(cells.get(i), new Rectanglei(
+                    horizPos * cellSize.x, vertPos * cellSize.y).setSize(cellSize.x, cellSize.y)
             );
         }
     }
