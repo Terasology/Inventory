@@ -31,10 +31,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
@@ -261,7 +262,8 @@ public class InventoryAuthoritySystemTest {
 
         Mockito.when(inventory.send(any(BeforeItemRemovedFromInventory.class))).then(
                 invocation -> {
-                    BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
+                    BeforeItemRemovedFromInventory event =
+                            (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
                     event.consume();
                     return null;
                 });
@@ -504,7 +506,8 @@ public class InventoryAuthoritySystemTest {
         List<Integer> toSlots = Arrays.asList(0, 2);
 
         // The method that gets tested:
-        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
+        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory,
+                toSlots);
         assertTrue(result);
 
         assertEquals(10, itemA1.getComponent(ItemComponent.class).stackCount);
@@ -544,7 +547,8 @@ public class InventoryAuthoritySystemTest {
         List<Integer> toSlots = Arrays.asList(0, 1, 2, 3, 4);
 
         // The method that gets tested:
-        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
+        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory,
+                toSlots);
         assertTrue(result);
 
         /*
@@ -592,7 +596,8 @@ public class InventoryAuthoritySystemTest {
         List<Integer> toSlots = Arrays.asList(0, 1, 2, 3, 4);
 
         // The method that gets tested:
-        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
+        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory,
+                toSlots);
         assertFalse(result);
 
         assertEquals(8, itemA1.getComponent(ItemComponent.class).stackCount);
@@ -623,7 +628,8 @@ public class InventoryAuthoritySystemTest {
         List<Integer> toSlots = Arrays.asList(0, 1, 2);
 
         // The method that gets tested:
-        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
+        boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory,
+                toSlots);
         assertFalse(result);
 
         assertEquals(10, itemA1.getComponent(ItemComponent.class).stackCount);
@@ -631,5 +637,4 @@ public class InventoryAuthoritySystemTest {
         assertEquals(4, itemA3.getComponent(ItemComponent.class).stackCount);
         assertEquals(itemA3, fromInventoryComp.itemSlots.get(fromSlot));
     }
-
 }

@@ -16,64 +16,46 @@
 
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
+import org.terasology.moduletestingenvironment.MTEExtension;
+import org.terasology.moduletestingenvironment.extension.Dependencies;
+import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
+import org.terasology.registry.In;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+@ExtendWith(MTEExtension.class)
+@UseWorldGenerator("ModuleTestingEnvironment:empty")
+@Dependencies({"Inventory"})
 public class InventoryManagerTest {
 
-    private static ModuleTestingEnvironment mte;
+    @In
+    protected EntityManager entityManager;
+    @In
+    protected InventoryManager inventoryManager;
+    @In
+    protected BlockManager blockManager;
 
-    private EntityManager entityManager;
-    private InventoryManager inventoryManager;
-    private BlockManager blockManager;
     private EntityRef inventory;
-
-    @BeforeAll
-    public static void setup() throws Exception {
-        mte = new ModuleTestingEnvironment() {
-            @Override
-            public Set<String> getDependencies() {
-                return Sets.newHashSet("CoreAssets", "Inventory");
-            }
-        };
-        mte.setup();
-    }
-
-    @AfterAll
-    public static void tearDown() throws Exception {
-        mte.tearDown();
-    }
 
     @BeforeEach
     public void beforeEach() {
-        Context hostContext = mte.getHostContext();
-
-        entityManager = hostContext.get(EntityManager.class);
-        inventoryManager = hostContext.get(InventoryManager.class);
-        blockManager = hostContext.get(BlockManager.class);
-
         inventory = entityManager.create(new InventoryComponent(3));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
-    public void giveItem_zeroBlocks(int amount) {
+    public void giveItemZeroBlocks(int amount) {
         EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
@@ -83,7 +65,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(bytes = {0, -1})
-    public void giveItem_zeroItems(byte amount) {
+    public void giveItemZeroItems(byte amount) {
         EntityRef item = getPrefabItem(entityManager, amount, false);
         inventoryManager.giveItem(inventory, EntityRef.NULL, item);
 
@@ -93,7 +75,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 99})
-    public void giveItem_blockStack(int amount) {
+    public void giveItemBlockStack(int amount) {
         EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
@@ -106,7 +88,7 @@ public class InventoryManagerTest {
     }
 
     @Test
-    public void giveItem_nonStackableItem() {
+    public void giveItemNonStackableItem() {
         EntityRef singleItem = getPrefabItem(entityManager, (byte) 1, false);
         inventoryManager.giveItem(inventory, EntityRef.NULL, singleItem);
 
@@ -120,7 +102,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(bytes = {1, 2, 99})
-    public void giveItem_stackableItem(byte amount) {
+    public void giveItemStackableItem(byte amount) {
         final EntityRef stackedItem = getPrefabItem(entityManager, amount, true);
 
         inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
