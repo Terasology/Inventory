@@ -55,7 +55,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
-    public void giveItemZeroBlocks(int amount) {
+    public void giveItem_zeroBlocks(int amount) {
         EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
@@ -65,7 +65,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(bytes = {0, -1})
-    public void giveItemZeroItems(byte amount) {
+    public void giveItem_zeroItems(byte amount) {
         EntityRef item = getPrefabItem(entityManager, amount, false);
         inventoryManager.giveItem(inventory, EntityRef.NULL, item);
 
@@ -75,7 +75,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 99})
-    public void giveItemBlockStack(int amount) {
+    public void giveItem_blockStack(int amount) {
         EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
@@ -88,7 +88,7 @@ public class InventoryManagerTest {
     }
 
     @Test
-    public void giveItemNonStackableItem() {
+    public void giveItem_nonStackableItem() {
         EntityRef singleItem = getPrefabItem(entityManager, (byte) 1, false);
         inventoryManager.giveItem(inventory, EntityRef.NULL, singleItem);
 
@@ -102,7 +102,7 @@ public class InventoryManagerTest {
 
     @ParameterizedTest
     @ValueSource(bytes = {1, 2, 99})
-    public void giveItemStackableItem(byte amount) {
+    public void giveItem_stackableItem(byte amount) {
         final EntityRef stackedItem = getPrefabItem(entityManager, amount, true);
 
         inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
