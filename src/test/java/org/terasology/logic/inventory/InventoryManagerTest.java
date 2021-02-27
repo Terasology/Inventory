@@ -16,187 +16,132 @@
 
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Sets;
-import org.junit.Assert;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
+import org.terasology.moduletestingenvironment.MTEExtension;
+import org.terasology.moduletestingenvironment.extension.Dependencies;
+import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
+import org.terasology.registry.In;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+@ExtendWith(MTEExtension.class)
+@UseWorldGenerator("ModuleTestingEnvironment:empty")
+@Dependencies({"Inventory"})
 public class InventoryManagerTest {
 
-    static final String URI_DIRT = "CoreAssets:Dirt";
+    @In
+    protected EntityManager entityManager;
+    @In
+    protected InventoryManager inventoryManager;
+    @In
+    protected BlockManager blockManager;
 
-    private static ModuleTestingEnvironment context;
-
-    private Context hostContext;
-    private EntityManager entityManager;
-    private InventoryManager inventoryManager;
-    private BlockManager blockManager;
     private EntityRef inventory;
-
-    @BeforeAll
-    public static void setup() throws Exception {
-        context = new ModuleTestingEnvironment() {
-            @Override
-            public Set<String> getDependencies() {
-                return Sets.newHashSet("CoreAssets", "Inventory");
-            }
-        };
-        context.setup();
-    }
-
-    @AfterAll
-    public static void tearDown() throws Exception {
-        context.tearDown();
-    }
 
     @BeforeEach
     public void beforeEach() {
-        hostContext = context.getHostContext();
-
-        entityManager = hostContext.get(EntityManager.class);
-        inventoryManager = hostContext.get(InventoryManager.class);
-        blockManager = hostContext.get(BlockManager.class);
-
         inventory = entityManager.create(new InventoryComponent(3));
     }
 
     @ParameterizedTest
-    @ValueSource(bytes = {0, -1})
-    public void giveItem_zeroBlocks(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
+    @ValueSource(ints = {0, -1})
+    @DisplayName("give zero Blocks to Player")
+    public void giveItemZeroBlocks(int amount) {
+        EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("No slots should be filled", 0, filledSlots.size());
+        Assertions.assertEquals(0, filledSlots.size(), "No slots should be filled");
+    }
+
+    @ParameterizedTest
+    @ValueSource(bytes = {0, -1})
+    @DisplayName("Give zero Items to Player")
+    public void giveItemZeroItems(byte amount) {
+        EntityRef item = getPrefabItem(entityManager, amount, false);
+        inventoryManager.giveItem(inventory, EntityRef.NULL, item);
+
+        final List<EntityRef> filledSlots = getFilledSlots(inventory);
+        Assertions.assertEquals(0, filledSlots.size(), "No slots should be filled");
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 99})
-    public void giveItem_singleStack(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
+    @DisplayName("Give Stack of Blocks from 1-99")
+    public void giveItemBlockStack(int amount) {
+        EntityRef blockItem = getBlockItem(entityManager, blockManager, amount);
         inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
         filledSlots.forEach(item -> {
-            Assert.assertEquals("Slot should contain exactly the added block", blockItem, item);
-
-            final int maxStackSize = blockItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be " + amount + " or maximum stack size",
-                    Math.min(amount, maxStackSize), item.getComponent(ItemComponent.class).stackCount);
+            Assertions.assertEquals(blockItem, item, "Slot should contain exactly the added block");
+            Assertions.assertEquals(amount, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {100, 128, 256})
-    public void giveItem_blockExceedingStacksize(int amount) {
-        EntityRef blockItem = getDirtBlockItem(entityManager, blockManager, amount);
-        inventoryManager.giveItem(inventory, EntityRef.NULL, blockItem);
+    @Test
+    @DisplayName("Give non stackable items")
+    public void giveItemNonStackableItem() {
+        EntityRef singleItem = getPrefabItem(entityManager, (byte) 1, false);
+        inventoryManager.giveItem(inventory, EntityRef.NULL, singleItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
         filledSlots.forEach(item -> {
-            Assert.assertEquals("Slot should contain exactly the added block", blockItem, item);
-
-            final int maxStackSize = blockItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be capped at maximum stack size",
-                    Math.min(amount, maxStackSize), item.getComponent(ItemComponent.class).stackCount);
-        });
-    }
-
-    @ParameterizedTest
-    @ValueSource(bytes = {1, 2})
-    public void giveItem_nonStackableItem(byte amount) {
-        final EntityRef originalItem = entityManager.create("CoreAssets:Axe");
-        originalItem.updateComponent(ItemComponent.class, component -> {
-            component.stackCount = amount;
-            return component;
-        });
-
-        Assert.assertTrue(originalItem.getComponent(ItemComponent.class).stackId.isEmpty());
-
-        inventoryManager.giveItem(inventory, EntityRef.NULL, originalItem);
-
-        final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the non-stackable item", originalItem, slot);
-
-            final int maxStackSize = originalItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Unexpected stack count",
-                    1, slot.getComponent(ItemComponent.class).stackCount);
-
+            Assertions.assertEquals(singleItem, item, "Slot should contain exactly the non-stackable item");
+            Assertions.assertEquals(1, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
     @ParameterizedTest
     @ValueSource(bytes = {1, 2, 99})
-    public void giveItem_stackableItem(byte amount) {
-        final EntityRef stackedItem = entityManager.create("CoreAssets:Axe");
-        stackedItem.updateComponent(ItemComponent.class, component -> {
-            component.stackId = "CoreAssets:Axe"; // make the core axe stackable for this test
-            component.stackCount = amount;
-            return component;
-        });
-
-        Assert.assertFalse(stackedItem.getComponent(ItemComponent.class).stackId.isEmpty());
+    @DisplayName("Give stackable items")
+    public void giveItemStackableItem(byte amount) {
+        final EntityRef stackedItem = getPrefabItem(entityManager, amount, true);
 
         inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
 
         final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the stackable item", stackedItem, slot);
-
-            final int maxStackSize = stackedItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Unexpected stack count!",
-                    Math.min(amount, maxStackSize), slot.getComponent(ItemComponent.class).stackCount);
+        Assertions.assertEquals(1, filledSlots.size(), "Exactly one slot should be filled");
+        filledSlots.forEach(item -> {
+            Assertions.assertEquals(stackedItem, item, "Slot should contain exactly the stackable item");
+            Assertions.assertEquals(amount, item.getComponent(ItemComponent.class).stackCount, "Unexpected stack count!");
         });
     }
 
-    @ParameterizedTest
-    @ValueSource(bytes = {100, 127})
-    public void giveItem_stackableItemExceedingStackSize(byte amount) {
-        final EntityRef stackedItem = entityManager.create("CoreAssets:Axe");
-        stackedItem.updateComponent(ItemComponent.class, component -> {
-            component.stackId = "CoreAssets:Axe"; // make the core axe stackable for this test
-            component.stackCount = amount;
-            return component;
-        });
-
-        inventoryManager.giveItem(inventory, EntityRef.NULL, stackedItem);
-
-        final List<EntityRef> filledSlots = getFilledSlots(inventory);
-        Assert.assertEquals("Exactly one slot should be filled", 1, filledSlots.size());
-        filledSlots.forEach(slot -> {
-            Assert.assertEquals("Slot should contain exactly the non-stackable item", stackedItem, slot);
-
-            final int maxStackSize = stackedItem.getComponent(ItemComponent.class).maxStackSize;
-            Assert.assertEquals("Stack count should be capped at maximum stack size",
-                    Math.min(amount, maxStackSize), slot.getComponent(ItemComponent.class).stackCount);
-        });
-    }
-
-    private static EntityRef getDirtBlockItem(EntityManager entityManager, BlockManager blockManager, int amount) {
+    private static EntityRef getBlockItem(EntityManager entityManager, BlockManager blockManager, int amount) {
+        final String uri = "CoreAssets:Dirt";
         final BlockItemFactory factory = new BlockItemFactory(entityManager);
-        final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(URI_DIRT), amount);
+        final EntityRef blockItem = factory.newInstance(blockManager.getBlockFamily(uri), amount);
 
-        Assert.assertNotEquals("Cannot create a block item instance for '" + URI_DIRT + "'",
-                EntityRef.NULL, blockItem);
+        Assertions.assertNotEquals(EntityRef.NULL, blockItem,
+                "Cannot create a block item instance for '" + uri + "'");
         return blockItem;
+    }
+
+    private static EntityRef getPrefabItem(EntityManager entityManager, byte amount, boolean stackable) {
+        final String uri = "CoreAssets:Axe";
+        final EntityRef item = entityManager.create(uri);
+        item.updateComponent(ItemComponent.class, component -> {
+            component.stackCount = amount;
+            if (stackable) {
+                component.stackId = uri;
+            }
+            return component;
+        });
+        return item;
     }
 
     private static List<EntityRef> getFilledSlots(EntityRef inventory) {

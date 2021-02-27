@@ -53,6 +53,11 @@ import java.util.List;
  */
 public class StartingInventoryComponent implements Component {
 
+    /**
+     * The list of objects contained in the starting inventory.
+     * <p>
+     * Default is an empty list.
+     */
     public List<InventoryItem> items = Lists.newLinkedList();
 
     /**
@@ -66,6 +71,8 @@ public class StartingInventoryComponent implements Component {
 
         /**
          * Must be greater than 0.
+         * <p>
+         * Default value is 1.
          */
         public int quantity = 1;
 
@@ -74,6 +81,8 @@ public class StartingInventoryComponent implements Component {
          * <p>
          * Adding inventory items to this list will cause a {@link InventoryComponent} to be added to this object. The
          * nested inventory is filled with the items specified in this list.
+         * <p>
+         * Default value is the empty list.
          */
         public List<InventoryItem> items = Lists.newLinkedList();
     }

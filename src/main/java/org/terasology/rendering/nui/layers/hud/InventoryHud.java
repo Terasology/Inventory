@@ -19,8 +19,9 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.LayoutConfig;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
 public class InventoryHud extends CoreHudWidget {
@@ -33,10 +34,19 @@ public class InventoryHud extends CoreHudWidget {
 
     private UICrosshair crosshair;
 
+    // Set "true" to use the rotating style quickslot; set "false" to get the default style quickslot
+    @LayoutConfig
+    private boolean rotateItems = false;
+
     @Override
     public void initialise() {
         for (InventoryCell cell : findAll(InventoryCell.class)) {
-            cell.bindSelected(new SlotSelectedBinding(cell.getTargetSlot(), localPlayer));
+            int offset = cell.getTargetSlot();
+            if (rotateItems) {
+                cell.bindTargetSlot(new TargetSlotBinding(offset, localPlayer));
+            } else {
+                cell.bindSelected(new SlotSelectedBinding(offset, localPlayer));
+            }
             cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
                 @Override
                 public EntityRef get() {
@@ -67,6 +77,24 @@ public class InventoryHud extends CoreHudWidget {
         public Boolean get() {
             SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             return component != null && component.slot == slot;
+        }
+    }
+
+    private class TargetSlotBinding extends ReadOnlyBinding<Integer> {
+
+        private int offset;
+        private LocalPlayer localPlayer;
+
+        public TargetSlotBinding(int targetSlot, LocalPlayer localPlayer) {
+            this.offset = targetSlot;
+            this.localPlayer = localPlayer;
+        }
+
+        @Override
+        public Integer get() {
+            SelectedInventorySlotComponent component =
+                    localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
+            return (component.slot + offset) % 10;
         }
     }
 }

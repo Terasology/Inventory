@@ -16,20 +16,21 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.primitives.UnsignedBytes;
-import org.terasology.utilities.Assets;
+import org.joml.Vector2i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.widgets.TooltipLine;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.TooltipLine;
+import org.terasology.utilities.Assets;
 import org.terasology.world.block.items.BlockItemComponent;
 
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.Optional;
  */
 public abstract class ItemCell extends CoreWidget {
     protected ItemIcon icon = new ItemIcon();
+    @LayoutConfig
     private Binding<Boolean> selected = new DefaultBinding<>(false);
 
     public ItemCell() {

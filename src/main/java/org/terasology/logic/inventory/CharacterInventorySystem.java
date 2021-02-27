@@ -1,26 +1,9 @@
-/*
- * Copyright 2016 MovingBlocks
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 package org.terasology.logic.inventory;
 
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.utilities.Assets;
+import org.joml.Vector3f;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -37,6 +20,7 @@ import org.terasology.input.binds.inventory.ToolbarSlotButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.events.ChangeHeldItemRequest;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.DropItemRequest;
@@ -44,12 +28,15 @@ import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.hud.InventoryHud;
+import org.terasology.utilities.Assets;
 
 @RegisterSystem
 public class CharacterInventorySystem extends BaseComponentSystem {
@@ -181,8 +168,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             // Compute new position
             dropPower *= 150f;
 
-            Vector3f position = localPlayer.getViewPosition();
-            Vector3f direction = localPlayer.getViewDirection();
+            Vector3f position = localPlayer.getViewPosition(new Vector3f());
+            Vector3f direction = localPlayer.getViewDirection(new Vector3f());
 
             Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
             HitResult hitResult = physics.rayTrace(position, direction, 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
@@ -191,15 +178,14 @@ public class CharacterInventorySystem extends BaseComponentSystem {
                 maxAllowedDistanceInDirection = possibleNewPosition.sub(position);
             }
 
-            Vector3f newPosition = position;
-            newPosition.add(maxAllowedDistanceInDirection.mul(0.9f));
+            position.add(maxAllowedDistanceInDirection.mul(0.9f));
 
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(direction);
-            impulseVector.scale(dropPower);
+            impulseVector.mul(dropPower);
             entity.send(new DropItemRequest(selectedItemEntity, entity,
-                    impulseVector,
-                    newPosition));
+                impulseVector,
+                position));
 
             characterHeldItemComponent.lastItemUsedTime = time.getGameTimeInMs();
             entity.saveComponent(characterHeldItemComponent);

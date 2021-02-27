@@ -18,21 +18,21 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import org.joml.Vector2i;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
+import org.terasology.joml.geom.Rectanglei;
 import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.events.NUIMouseClickEvent;
+import org.terasology.nui.BaseInteractionListener;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.InteractionListener;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.UIWidget;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.events.NUIMouseClickEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -118,16 +118,18 @@ public class InventoryGrid extends CoreWidget {
             return;
         }
         Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
+        if (cellSize.x() == 0 || cellSize.y() == 0) {
             return;
         }
         canvas.addInteractionRegion(interactionListener);
 
-        int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX()));
+        int horizontalCells = Math.max(1, Math.min(maxHorizontalCells, canvas.size().x() / cellSize.x()));
         for (int i = 0; i < numSlots && i < cells.size(); ++i) {
             int horizPos = i % horizontalCells;
             int vertPos = i / horizontalCells;
-            canvas.drawWidget(cells.get(i), Rect2i.createFromMinAndSize(horizPos * cellSize.x, vertPos * cellSize.y, cellSize.x, cellSize.y));
+            canvas.drawWidget(cells.get(i), new Rectanglei(
+                    horizPos * cellSize.x, vertPos * cellSize.y).setSize(cellSize.x, cellSize.y)
+            );
         }
     }
 
@@ -135,13 +137,13 @@ public class InventoryGrid extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
         if (numSlots == 0 || cells.isEmpty()) {
-            return Vector2i.zero();
+            return new Vector2i();
         }
         Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
-        if (cellSize.getX() == 0 || cellSize.getY() == 0) {
-            return Vector2i.zero();
+        if (cellSize.x() == 0 || cellSize.y() == 0) {
+            return new Vector2i();
         }
-        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
+        int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.x() / cellSize.x());
         int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
         return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }
