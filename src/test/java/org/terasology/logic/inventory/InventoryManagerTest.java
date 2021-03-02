@@ -16,58 +16,40 @@
 
 package org.terasology.logic.inventory;
 
-import com.google.common.collect.Sets;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.moduletestingenvironment.ModuleTestingEnvironment;
+import org.terasology.moduletestingenvironment.MTEExtension;
+import org.terasology.moduletestingenvironment.extension.Dependencies;
+import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
+import org.terasology.registry.In;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+@ExtendWith(MTEExtension.class)
+@UseWorldGenerator("ModuleTestingEnvironment:empty")
+@Dependencies({"Inventory"})
 public class InventoryManagerTest {
 
-    private static ModuleTestingEnvironment mte;
+    @In
+    protected EntityManager entityManager;
+    @In
+    protected InventoryManager inventoryManager;
+    @In
+    protected BlockManager blockManager;
 
-    private EntityManager entityManager;
-    private InventoryManager inventoryManager;
-    private BlockManager blockManager;
     private EntityRef inventory;
-
-    @BeforeAll
-    public static void setup() throws Exception {
-        mte = new ModuleTestingEnvironment() {
-            @Override
-            public Set<String> getDependencies() {
-                return Sets.newHashSet("CoreAssets", "Inventory");
-            }
-        };
-        mte.setup();
-    }
-
-    @AfterAll
-    public static void tearDown() throws Exception {
-        mte.tearDown();
-    }
 
     @BeforeEach
     public void beforeEach() {
-        Context hostContext = mte.getHostContext();
-
-        entityManager = hostContext.get(EntityManager.class);
-        inventoryManager = hostContext.get(InventoryManager.class);
-        blockManager = hostContext.get(BlockManager.class);
-
         inventory = entityManager.create(new InventoryComponent(3));
     }
 

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -31,6 +32,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -53,6 +55,11 @@ public class StartingInventorySystem extends BaseComponentSystem {
 
     BlockItemFactory blockFactory;
 
+    /**
+     * Collect entities without inventory component, which have nested items configured in the {@link StartingInventoryComponent}.
+     */
+    private final Set<String> entitiesWithoutInventory = Sets.newHashSet();
+
     @Override
     public void initialise() {
         blockFactory = new BlockItemFactory(entityManager);
@@ -60,10 +67,24 @@ public class StartingInventorySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onStartingInventory(OnPlayerSpawnedEvent event,
-                                    EntityRef entityRef,
+                                    EntityRef player,
                                     StartingInventoryComponent startingInventory) {
-        addItemsTo(startingInventory.items, entityRef);
-        entityRef.removeComponent(StartingInventoryComponent.class);
+        entitiesWithoutInventory.clear();
+        addItemsTo(startingInventory.items, player, player.getParentPrefab().getName());
+        player.removeComponent(StartingInventoryComponent.class);
+        logErrors();
+    }
+
+    /**
+     * Collectively log errors found during the assembly of the starting inventory.
+     * <p>
+     * The collected errors in {@link #entitiesWithoutInventory} will be empty after this call returns.
+     */
+    private void logErrors() {
+        if (!entitiesWithoutInventory.isEmpty()) {
+            logger.warn("Cannot add starting inventory objects to entities without inventory component!\n{}", entitiesWithoutInventory);
+            entitiesWithoutInventory.clear();
+        }
     }
 
     /**
@@ -87,20 +108,31 @@ public class StartingInventorySystem extends BaseComponentSystem {
         return true;
     }
 
-    private void addToInventory(EntityRef entityRef,
+    /**
+     * Attempt to resolve the given {@code item} as block or item and add it to the entity's inventory.
+     * <p>
+     * If the item cannot be resolved the target inventory will not be changed.
+     * <p>
+     * <strong>Calling this method may add errors to {@link #entitiesWithoutInventory}.</strong>
+     *
+     * @param entity the entity with {@link InventoryComponent} to add the item to
+     * @param item the item to add to the entity's inventory
+     */
+    private void addToInventory(EntityRef entity,
                                 StartingInventoryComponent.InventoryItem item) {
 
-        //TODO(Java9): Use Optional::or instead (https://docs.oracle.com/javase/9/docs/api/java/util/Optional.html#or-java.util.function.Supplier-)
+        //TODO(Java9): Use Optional::or instead (https://docs.oracle.com/javase/9/docs/api/java/util/Optional
+        // .html#or-java.util.function.Supplier-)
         //             This article describes the issue and provides the solution used here:
         //                  https://www.baeldung.com/java-optional-or-else-optional#1-lazy-evaluation
         final Optional<Supplier<EntityRef>> possibleItem =
-                resolveAsBlock(item.uri).map(Optional::of).orElseGet(() -> resolveAsItem(item.uri));
+                resolveAsItem(item.uri).map(Optional::of).orElseGet(() -> resolveAsBlock(item.uri));
 
         if (possibleItem.isPresent()) {
             Stream.generate(possibleItem.get())
                     .limit(item.quantity)
-                    .map(i -> addItemsTo(item.items, i))
-                    .forEach(o -> inventoryManager.giveItem(entityRef, EntityRef.NULL, o));
+                    .map(i -> addItemsTo(item.items, i, item.uri))
+                    .forEach(o -> inventoryManager.giveItem(entity, EntityRef.NULL, o));
         } else {
             logger.warn("Could not resolve '{}' to either block or item.", item.uri);
         }
@@ -113,19 +145,21 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * <p>
      * If the list of nested items is empty or the entity does not have an inventory component this method does
      * nothing.
+     * <p>
+     * <strong>Calling this method may add errors to {@link #entitiesWithoutInventory}.</strong>
      *
      * @param items the objects to add to the entity's inventory
      * @param entity the entity to add the starting inventory objects to
+     * @param entityDescriptor a descriptive string (name or Uri) for the entity, used for logging
      */
-    private EntityRef addItemsTo(List<StartingInventoryComponent.InventoryItem> items, EntityRef entity) {
-        if (entity.hasComponent(InventoryComponent.class)) {
+    private EntityRef addItemsTo(List<StartingInventoryComponent.InventoryItem> items, EntityRef entity,
+                                 String entityDescriptor) {
+        if (items.isEmpty() || entity.hasComponent(InventoryComponent.class)) {
             items.stream()
                     .filter(this::isValid)
                     .forEach(item -> addToInventory(entity, item));
         } else {
-            logger.warn(
-                    "Cannot add starting inventory objects to entity without inventory component!\n{}",
-                    entity.toFullDescription());
+            entitiesWithoutInventory.add(entityDescriptor);
         }
         return entity;
     }

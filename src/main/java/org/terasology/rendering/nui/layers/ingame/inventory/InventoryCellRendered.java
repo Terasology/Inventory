@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.rendering.nui.Canvas;
+import org.terasology.nui.Canvas;
 
 public class InventoryCellRendered implements Event {
     private Canvas canvas;
