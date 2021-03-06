@@ -15,9 +15,10 @@
  */
 package org.terasology.logic.inventory;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -27,48 +28,48 @@ public class StartingInventorySystemTest {
     @Test
     @Disabled
     public void giveSingleBlock() {
-        Assert.assertTrue("Player inventory should contain exactly the single block.", false);
+        assertTrue(false, "Player inventory should contain exactly the single block.");
     }
 
     @Test
     @Disabled
     public void giveBlockStack() {
-        Assert.assertTrue("Player inventory should contain exactly the block stack.", false);
+        assertTrue(false, "Player inventory should contain exactly the block stack.");
     }
 
     @Test
     @Disabled
     public void giveSingleItem() {
-        Assert.assertTrue("Player inventory should contain exactly the single item.", false);
+        assertTrue(false, "Player inventory should contain exactly the single item.");
     }
 
     @Test
     @Disabled
     public void giveNonStackableItem() {
-        Assert.assertTrue("Player inventory should contain multiple instances of the non-stackable item.", false);
+        assertTrue(false, "Player inventory should contain multiple instances of the non-stackable item.");
     }
 
     @Test
     @Disabled
     public void giveStackableItemExceedingStackSize() {
-        Assert.assertTrue("Player inventory should contain multiple slots filled with the stackable item.", false);
+        assertTrue(false, "Player inventory should contain multiple slots filled with the stackable item.");
     }
 
     @Test
     @Disabled
     public void giveStackableItemExceedingInventorySize() {
-        Assert.assertTrue("Player inventory should be filled completely with non-stackable item.", false);
+        assertTrue(false, "Player inventory should be filled completely with non-stackable item.");
     }
 
     @Test
     @Disabled
     public void giveMultipleItems() {
-        Assert.assertTrue("Player inventory should contain all given items in correct amount.", false);
+        assertTrue(false, "Player inventory should contain all given items in correct amount.");
     }
 
     @Test
     @Disabled
     public void giveStackableItemSplitStacks() {
-        Assert.assertTrue("Player inventory should contain a single item stack with combined amount.", false);
+        assertTrue(false, "Player inventory should contain a single item stack with combined amount.");
     }
 }
