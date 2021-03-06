@@ -16,8 +16,8 @@
 package org.terasology.logic.inventory;
 
 import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -25,49 +25,49 @@ import org.junit.Test;
 public class StartingInventorySystemTest {
 
     @Test
-    @Ignore
+    @Disabled
     public void giveSingleBlock() {
         Assert.assertTrue("Player inventory should contain exactly the single block.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveBlockStack() {
         Assert.assertTrue("Player inventory should contain exactly the block stack.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveSingleItem() {
         Assert.assertTrue("Player inventory should contain exactly the single item.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveNonStackableItem() {
         Assert.assertTrue("Player inventory should contain multiple instances of the non-stackable item.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveStackableItemExceedingStackSize() {
         Assert.assertTrue("Player inventory should contain multiple slots filled with the stackable item.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveStackableItemExceedingInventorySize() {
         Assert.assertTrue("Player inventory should be filled completely with non-stackable item.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveMultipleItems() {
         Assert.assertTrue("Player inventory should contain all given items in correct amount.", false);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void giveStackableItemSplitStacks() {
         Assert.assertTrue("Player inventory should contain a single item stack with combined amount.", false);
     }
