@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.math.IntegerRange;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.math.IntegerRange;
 
 import java.util.Map;
 

@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
-import org.terasology.input.binds.inventory.InventoryButton;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.ClientComponent;
+import org.terasology.engine.input.binds.inventory.InventoryButton;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.characters.interactions.InteractionUtil;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.ClientComponent;
 import org.terasology.nui.ControlWidget;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
 
 import java.util.ArrayList;
 import java.util.List;

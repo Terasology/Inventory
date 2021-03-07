@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.hud;
+package org.terasology.engine.rendering.nui.layers.hud;
 
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.inventory.InventoryUtils;
+import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
 import org.terasology.nui.events.NUIMouseClickEvent;
-import org.terasology.registry.In;
+import org.terasology.engine.registry.In;
 
 /**
  * A region/layer around the inventory grid to allow players to get rid of extra items

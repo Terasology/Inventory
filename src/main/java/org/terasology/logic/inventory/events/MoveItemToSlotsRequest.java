@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.inventory.events;
+package org.terasology.engine.logic.inventory.events;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.ServerEvent;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.network.ServerEvent;
 
 import java.util.Collection;
 import java.util.List;

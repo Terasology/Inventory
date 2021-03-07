@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -22,27 +22,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.entity.BlockCommands;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.items.BlockItemComponent;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.entitySystem.prefab.PrefabManager;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.console.Console;
+import org.terasology.engine.logic.console.commandSystem.annotations.Command;
+import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.logic.permission.PermissionManager;
+import org.terasology.engine.network.ClientComponent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
+import org.terasology.engine.world.block.BlockManager;
+import org.terasology.engine.world.block.BlockUri;
+import org.terasology.engine.world.block.entity.BlockCommands;
+import org.terasology.engine.world.block.family.BlockFamily;
+import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.engine.world.block.loader.BlockFamilyDefinition;
+import org.terasology.engine.world.block.shapes.BlockShape;
 
 import java.util.Collections;
 import java.util.List;

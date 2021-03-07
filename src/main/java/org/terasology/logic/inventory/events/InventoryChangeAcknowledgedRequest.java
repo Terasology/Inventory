@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.inventory.events;
+package org.terasology.engine.logic.inventory.events;
 
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.OwnerEvent;
+import org.terasology.engine.network.NetworkEvent;
+import org.terasology.engine.network.OwnerEvent;
 
 /**
  * Message to acknowledge an inventory change request as complete, to be sent back to the requester so they can stop

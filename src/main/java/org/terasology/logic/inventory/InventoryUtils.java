@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
 import org.joml.Vector3f;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
-import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
-import org.terasology.logic.inventory.events.DropItemRequest;
-import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
-import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.engine.entitySystem.Component;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.logic.inventory.events.BeforeItemPutInInventory;
+import org.terasology.engine.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.engine.logic.inventory.events.DropItemRequest;
+import org.terasology.engine.logic.inventory.events.InventorySlotChangedEvent;
+import org.terasology.engine.logic.inventory.events.InventorySlotStackSizeChangedEvent;
+import org.terasology.engine.logic.players.LocalPlayer;
 
 import java.util.HashMap;
 import java.util.HashSet;

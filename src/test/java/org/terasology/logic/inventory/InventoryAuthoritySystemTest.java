@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.inventory.action.GiveItemAction;
-import org.terasology.logic.inventory.action.RemoveItemAction;
-import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
-import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
-import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
-import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.inventory.action.GiveItemAction;
+import org.terasology.engine.logic.inventory.action.RemoveItemAction;
+import org.terasology.engine.logic.inventory.events.BeforeItemPutInInventory;
+import org.terasology.engine.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.engine.logic.inventory.events.InventorySlotChangedEvent;
+import org.terasology.engine.logic.inventory.events.InventorySlotStackSizeChangedEvent;
 
 import java.util.Arrays;
 import java.util.LinkedList;

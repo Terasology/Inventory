@@ -1,42 +1,42 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
 import org.joml.Vector3f;
-import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.binds.inventory.DropItemButton;
-import org.terasology.input.binds.inventory.ToolbarNextButton;
-import org.terasology.input.binds.inventory.ToolbarPrevButton;
-import org.terasology.input.binds.inventory.ToolbarSlotButton;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.events.ChangeHeldItemRequest;
-import org.terasology.logic.characters.events.PlayerDeathEvent;
-import org.terasology.logic.inventory.events.ChangeSelectedInventorySlotRequest;
-import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.inventory.events.DropItemRequest;
-import org.terasology.logic.inventory.events.GiveItemEvent;
-import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.NetworkSystem;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.hud.InventoryHud;
-import org.terasology.utilities.Assets;
+import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
+import org.terasology.engine.core.Time;
+import org.terasology.engine.entitySystem.entity.EntityManager;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.input.binds.inventory.DropItemButton;
+import org.terasology.engine.input.binds.inventory.ToolbarNextButton;
+import org.terasology.engine.input.binds.inventory.ToolbarPrevButton;
+import org.terasology.engine.input.binds.inventory.ToolbarSlotButton;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
+import org.terasology.engine.logic.characters.events.ChangeHeldItemRequest;
+import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
+import org.terasology.engine.logic.inventory.events.ChangeSelectedInventorySlotRequest;
+import org.terasology.engine.logic.inventory.events.DropItemEvent;
+import org.terasology.engine.logic.inventory.events.DropItemRequest;
+import org.terasology.engine.logic.inventory.events.GiveItemEvent;
+import org.terasology.engine.logic.inventory.events.InventorySlotChangedEvent;
+import org.terasology.engine.logic.location.LocationComponent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.network.NetworkSystem;
+import org.terasology.engine.physics.HitResult;
+import org.terasology.engine.physics.Physics;
+import org.terasology.engine.physics.StandardCollisionGroup;
+import org.terasology.engine.physics.events.ImpulseEvent;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.rendering.nui.layers.hud.InventoryHud;
+import org.terasology.engine.utilities.Assets;
 
 @RegisterSystem
 public class CharacterInventorySystem extends BaseComponentSystem {

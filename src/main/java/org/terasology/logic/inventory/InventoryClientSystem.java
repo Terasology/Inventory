@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.engine.logic.inventory;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.inventory.action.MoveItemAction;
-import org.terasology.logic.inventory.action.SwitchItemAction;
-import org.terasology.logic.inventory.events.AbstractMoveItemRequest;
-import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.logic.inventory.events.MoveItemAmountRequest;
-import org.terasology.logic.inventory.events.MoveItemRequest;
-import org.terasology.logic.inventory.events.MoveItemToSlotsRequest;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.registry.In;
-import org.terasology.registry.Share;
+import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.event.ReceiveEvent;
+import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.RegisterMode;
+import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.logic.inventory.action.MoveItemAction;
+import org.terasology.engine.logic.inventory.action.SwitchItemAction;
+import org.terasology.engine.logic.inventory.events.AbstractMoveItemRequest;
+import org.terasology.engine.logic.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.engine.logic.inventory.events.MoveItemAmountRequest;
+import org.terasology.engine.logic.inventory.events.MoveItemRequest;
+import org.terasology.engine.logic.inventory.events.MoveItemToSlotsRequest;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.registry.Share;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds.inventory;
+package org.terasology.engine.input.binds.inventory;
 
-import org.terasology.input.DefaultBinding;
+import org.terasology.engine.input.DefaultBinding;
+import org.terasology.engine.input.RegisterBindButton;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
 
 /**
  */

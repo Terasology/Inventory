@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.ingame.inventory;
+package org.terasology.engine.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.joml.Vector2i;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.joml.geom.Rectanglei;
-import org.terasology.logic.inventory.InventoryUtils;
+import org.terasology.engine.logic.inventory.InventoryUtils;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.CoreWidget;
