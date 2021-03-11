@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 

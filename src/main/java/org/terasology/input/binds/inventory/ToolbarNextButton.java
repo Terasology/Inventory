@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.input.binds.inventory;
+package org.terasology.input.binds.inventory;
 
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.DefaultBinding;
-import org.terasology.input.ActivateMode;
-import org.terasology.input.InputType;
 import org.terasology.engine.input.RegisterBindButton;
+import org.terasology.input.ActivateMode;
 import org.terasology.input.ControllerId;
+import org.terasology.input.InputType;
 
 /**
  */

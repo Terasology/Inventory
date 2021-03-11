@@ -1,6 +1,6 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
-package org.terasology.engine.logic.inventory.block;
+package org.terasology.logic.inventory.block;
 
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -10,9 +10,6 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.health.DoDestroyEvent;
-import org.terasology.engine.logic.inventory.InventoryComponent;
-import org.terasology.engine.logic.inventory.InventoryManager;
-import org.terasology.engine.logic.inventory.InventoryUtils;
 import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
 import org.terasology.engine.logic.location.LocationComponent;
@@ -22,6 +19,9 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.world.block.items.BlockItemComponent;
 import org.terasology.engine.world.block.items.OnBlockItemPlaced;
 import org.terasology.engine.world.block.items.OnBlockToItem;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 
 /**
  */

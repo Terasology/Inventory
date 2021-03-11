@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.entitySystem.entity.EntityManager;
@@ -22,18 +22,19 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.logic.inventory.action.GiveItemAction;
-import org.terasology.engine.logic.inventory.action.MoveItemAction;
-import org.terasology.engine.logic.inventory.action.RemoveItemAction;
-import org.terasology.engine.logic.inventory.action.SwitchItemAction;
-import org.terasology.engine.logic.inventory.events.BeforeItemPutInInventory;
-import org.terasology.engine.logic.inventory.events.BeforeItemRemovedFromInventory;
-import org.terasology.engine.logic.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.engine.logic.inventory.events.MoveItemAmountRequest;
-import org.terasology.engine.logic.inventory.events.MoveItemRequest;
-import org.terasology.engine.logic.inventory.events.MoveItemToSlotsRequest;
+import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.logic.inventory.action.GiveItemAction;
+import org.terasology.logic.inventory.action.MoveItemAction;
+import org.terasology.logic.inventory.action.RemoveItemAction;
+import org.terasology.logic.inventory.action.SwitchItemAction;
+import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
+import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.logic.inventory.events.MoveItemAmountRequest;
+import org.terasology.logic.inventory.events.MoveItemRequest;
+import org.terasology.logic.inventory.events.MoveItemToSlotsRequest;
 
 import java.util.Arrays;
 import java.util.Collections;

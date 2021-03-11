@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.entitySystem.Component;
@@ -22,9 +22,9 @@ import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.network.ReplicationCheck;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.engine.world.block.items.AddToBlockBasedItem;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.util.List;
 

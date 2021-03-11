@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +24,15 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
-import org.terasology.engine.input.binds.inventory.InventoryButton;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.nui.ControlWidget;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.input.ButtonState;
+import org.terasology.input.binds.inventory.InventoryButton;
+import org.terasology.nui.ControlWidget;
 
 import java.util.ArrayList;
 import java.util.List;

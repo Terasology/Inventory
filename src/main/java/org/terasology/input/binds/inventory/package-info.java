@@ -32,6 +32,6 @@
                 "Inventory:toolbarSlot7",
                 "Inventory:toolbarSlot8",
                 "Inventory:toolbarSlot9"
-        }) package org.terasology.engine.input.binds.inventory;
+        }) package org.terasology.input.binds.inventory;
 
 import org.terasology.input.InputCategory;

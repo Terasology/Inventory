@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.joml.Quaternionf;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.terasology.engine.rendering.assets.mesh.Mesh;
+import org.terasology.engine.rendering.assets.texture.Texture;
+import org.terasology.engine.rendering.assets.texture.TextureRegion;
+import org.terasology.engine.rendering.nui.CanvasUtility;
+import org.terasology.engine.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
@@ -31,11 +36,6 @@ import org.terasology.nui.skin.UISkin;
 import org.terasology.nui.widgets.TooltipLine;
 import org.terasology.nui.widgets.TooltipLineRenderer;
 import org.terasology.nui.widgets.UIList;
-import org.terasology.engine.rendering.assets.mesh.Mesh;
-import org.terasology.engine.rendering.assets.texture.Texture;
-import org.terasology.engine.rendering.assets.texture.TextureRegion;
-import org.terasology.engine.rendering.nui.CanvasUtility;
-import org.terasology.engine.utilities.Assets;
 
 import java.util.ArrayList;
 import java.util.List;

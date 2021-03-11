@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.input.binds.inventory;
+package org.terasology.input.binds.inventory;
 
 import org.terasology.engine.input.BindButtonEvent;
 

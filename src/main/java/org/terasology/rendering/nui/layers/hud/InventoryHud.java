@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.hud;
+package org.terasology.rendering.nui.layers.hud;
 
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.LayoutConfig;
 import org.terasology.engine.registry.In;
-import org.terasology.engine.rendering.nui.layers.ingame.inventory.InventoryCell;
+import org.terasology.engine.rendering.nui.layers.hud.CoreHudWidget;
+import org.terasology.engine.rendering.nui.layers.hud.UICrosshair;
+import org.terasology.logic.inventory.SelectedInventorySlotComponent;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
 
 public class InventoryHud extends CoreHudWidget {
 

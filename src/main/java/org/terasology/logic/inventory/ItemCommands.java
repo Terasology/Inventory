@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -32,6 +32,7 @@ import org.terasology.engine.logic.console.Console;
 import org.terasology.engine.logic.console.commandSystem.annotations.Command;
 import org.terasology.engine.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.engine.logic.console.commandSystem.annotations.Sender;
+import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.permission.PermissionManager;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;

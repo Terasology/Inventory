@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory.events;
+package org.terasology.logic.inventory.events;
 
 import org.terasology.engine.entitySystem.event.Event;
 

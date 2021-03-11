@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.inventory.InventoryUtils;
 import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.nui.ControlWidget;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.DefaultBinding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.widgets.CursorAttachment;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.logic.inventory.InventoryUtils;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.CursorAttachment;
 
 /**
  */
