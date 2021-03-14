@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 /**
  * Add this to a component so that it will evaluate equals(...) before merging with an item stack

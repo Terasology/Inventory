@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory.block;
+package org.terasology.logic.inventory.block;
 
 import org.terasology.engine.entitySystem.Component;
 

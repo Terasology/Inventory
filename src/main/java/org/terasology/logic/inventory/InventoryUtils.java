@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.joml.Vector3f;
 import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.inventory.events.BeforeItemPutInInventory;
 import org.terasology.engine.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.engine.logic.inventory.events.DropItemRequest;

@@ -1,7 +1,7 @@
 // Copyright 2020 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.joml.Vector3f;
 import org.terasology.engine.audio.events.PlaySoundForOwnerEvent;
@@ -21,6 +21,7 @@ import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
 import org.terasology.engine.logic.characters.events.ChangeHeldItemRequest;
 import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
+import org.terasology.engine.logic.inventory.PickupComponent;
 import org.terasology.engine.logic.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
 import org.terasology.engine.logic.inventory.events.DropItemRequest;
@@ -35,7 +36,7 @@ import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.events.ImpulseEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
-import org.terasology.engine.rendering.nui.layers.hud.InventoryHud;
+import org.terasology.rendering.nui.layers.hud.InventoryHud;
 import org.terasology.engine.utilities.Assets;
 
 @RegisterSystem

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.joml.Vector2i;

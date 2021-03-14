@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,9 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.inventory.InventoryComponent;
-import org.terasology.engine.logic.inventory.InventoryManager;
-import org.terasology.engine.logic.inventory.InventoryUtils;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;

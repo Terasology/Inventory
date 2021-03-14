@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.inventory.InventoryUtils;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.ControlWidget;

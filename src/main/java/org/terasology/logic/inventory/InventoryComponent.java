@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.entitySystem.Component;

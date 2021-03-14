@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.engine.rendering.nui.layers.ingame.inventory;
+@API package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.module.sandbox.API;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +24,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.moduletestingenvironment.MTEExtension;
 import org.terasology.moduletestingenvironment.extension.Dependencies;
 import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;

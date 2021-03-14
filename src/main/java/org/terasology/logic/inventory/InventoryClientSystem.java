@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.logic.inventory;
+package org.terasology.logic.inventory;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.engine.logic.inventory.action.MoveItemAction;
-import org.terasology.engine.logic.inventory.action.SwitchItemAction;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
+import org.terasology.logic.inventory.action.MoveItemAction;
+import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.engine.logic.inventory.events.AbstractMoveItemRequest;
 import org.terasology.engine.logic.inventory.events.InventoryChangeAcknowledgedRequest;
 import org.terasology.engine.logic.inventory.events.MoveItemAmountRequest;
