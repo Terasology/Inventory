@@ -13,7 +13,7 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.module.inventory.input.binds.inventory.DropItemButton;
+import org.terasology.module.inventory.input.DropItemButton;
 import org.terasology.module.inventory.input.ToolbarNextButton;
 import org.terasology.module.inventory.input.ToolbarPrevButton;
 import org.terasology.module.inventory.input.ToolbarSlotButton;
