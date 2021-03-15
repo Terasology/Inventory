@@ -25,7 +25,7 @@ import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
-import org.terasology.engine.input.binds.inventory.InventoryButton;
+import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.players.LocalPlayer;

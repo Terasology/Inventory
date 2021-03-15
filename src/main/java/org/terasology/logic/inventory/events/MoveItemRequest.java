@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory.events;
+package org.terasology.logic.inventory.events;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.ServerEvent;

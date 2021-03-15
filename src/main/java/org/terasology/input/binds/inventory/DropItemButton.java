@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.input.binds.inventory;
+package org.terasology.input.binds.inventory;
 
 import org.terasology.engine.input.BindButtonEvent;
 import org.terasology.engine.input.DefaultBinding;

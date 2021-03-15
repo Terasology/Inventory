@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.engine.logic.inventory.events;
+package org.terasology.logic.inventory.events;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;

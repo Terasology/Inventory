@@ -23,10 +23,10 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.inventory.action.RemoveItemAction;
-import org.terasology.engine.logic.inventory.events.BeforeItemPutInInventory;
-import org.terasology.engine.logic.inventory.events.BeforeItemRemovedFromInventory;
-import org.terasology.engine.logic.inventory.events.InventorySlotChangedEvent;
-import org.terasology.engine.logic.inventory.events.InventorySlotStackSizeChangedEvent;
+import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
+import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
+import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
 
 import java.util.Arrays;
 import java.util.LinkedList;
