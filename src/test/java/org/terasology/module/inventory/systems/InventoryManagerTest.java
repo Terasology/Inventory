@@ -9,24 +9,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.inventory.ItemComponent;
-import org.terasology.module.inventory.systems.InventoryManager;
-import org.terasology.moduletestingenvironment.MTEExtension;
-import org.terasology.moduletestingenvironment.extension.Dependencies;
-import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.items.BlockItemFactory;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.moduletestingenvironment.MTEExtension;
+import org.terasology.moduletestingenvironment.extension.Dependencies;
+import org.terasology.moduletestingenvironment.extension.UseWorldGenerator;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @ExtendWith(MTEExtension.class)
 @UseWorldGenerator("ModuleTestingEnvironment:empty")
-@Dependencies({"Inventory"})
+@Dependencies({"Inventory", "CoreAssets"})
 public class InventoryManagerTest {
 
     @In
