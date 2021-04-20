@@ -13,7 +13,7 @@
     },
     {
       "id": "ModuleTestingEnvironment",
-      "minVersion": "0.2.0-SNAPSHOT",
+      "minVersion": "0.2.0",
       "optional": true
     }
   ],
