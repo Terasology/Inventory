@@ -3,18 +3,18 @@
 package org.terasology.module.inventory.systems;
 
 import org.joml.Vector3f;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.inventory.ItemComponent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.components.ItemDifferentiating;
 import org.terasology.module.inventory.events.BeforeItemPutInInventory;
 import org.terasology.module.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.module.inventory.events.DropItemRequest;
 import org.terasology.module.inventory.events.InventorySlotChangedEvent;
 import org.terasology.module.inventory.events.InventorySlotStackSizeChangedEvent;
-import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.components.ItemDifferentiating;
 
 import java.util.HashMap;
 import java.util.HashSet;

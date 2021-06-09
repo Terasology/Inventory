@@ -3,9 +3,9 @@
 package org.terasology.module.inventory.components;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.world.block.Block;
+import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * }
  * </pre>
  */
-public class StartingInventoryComponent implements Component {
+public class StartingInventoryComponent implements Component<StartingInventoryComponent> {
 
     /**
      * The list of objects contained in the starting inventory.
@@ -46,6 +46,11 @@ public class StartingInventoryComponent implements Component {
      * Default is an empty list.
      */
     public List<InventoryItem> items = Lists.newLinkedList();
+
+    @Override
+    public void copy(StartingInventoryComponent other) {
+        this.items = other.items;
+    }
 
     /**
      * A simple class connecting a resource (a {@link Block} or {@link Prefab}) to a quantity
