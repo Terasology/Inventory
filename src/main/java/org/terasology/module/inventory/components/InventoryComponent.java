@@ -44,7 +44,7 @@ public final class InventoryComponent implements Component<InventoryComponent>, 
 
     @Override
     public void copy(InventoryComponent other) {
-        this.itemSlots = other.itemSlots;
+        this.itemSlots = Lists.newArrayList(other.itemSlots);
         this.privateToOwner = other.privateToOwner;
     }
 }

@@ -8,6 +8,7 @@ import org.terasology.engine.world.block.Block;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class that allows you to specify a player's starting inventory easily.
@@ -49,7 +50,7 @@ public class StartingInventoryComponent implements Component<StartingInventoryCo
 
     @Override
     public void copy(StartingInventoryComponent other) {
-        this.items = other.items;
+        this.items = other.items.stream().map(InventoryItem::copy).collect(Collectors.toList());
     }
 
     /**
@@ -77,5 +78,13 @@ public class StartingInventoryComponent implements Component<StartingInventoryCo
          * Default value is the empty list.
          */
         public List<InventoryItem> items = Lists.newLinkedList();
+
+        private InventoryItem copy() {
+            InventoryItem inventoryItem = new InventoryItem();
+            inventoryItem.uri = this.uri;
+            inventoryItem.quantity = this.quantity;
+            inventoryItem.items = this.items.stream().map(InventoryItem::copy).collect(Collectors.toList());
+            return inventoryItem;
+        }
     }
 }
