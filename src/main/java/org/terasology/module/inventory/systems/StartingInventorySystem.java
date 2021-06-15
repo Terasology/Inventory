@@ -19,6 +19,7 @@ import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.components.StartingInventoryComponent;
+import org.terasology.module.inventory.events.RequestInventoryEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +63,15 @@ public class StartingInventorySystem extends BaseComponentSystem {
         entitiesWithoutInventory.clear();
         addItemsTo(startingInventory.items, player, player.getParentPrefab().getName());
         player.removeComponent(StartingInventoryComponent.class);
+        logErrors();
+    }
+
+    @ReceiveEvent
+    public void onRequestInventory(RequestInventoryEvent event,
+                                   EntityRef player,
+                                   StartingInventoryComponent startingInventory) {
+        entitiesWithoutInventory.clear();
+        addItemsTo(startingInventory.items, player, player.getParentPrefab().getName());
         logErrors();
     }
 
