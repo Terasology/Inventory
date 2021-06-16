@@ -18,6 +18,7 @@ import org.terasology.engine.registry.In;
 import org.terasology.engine.world.block.BlockManager;
 import org.terasology.engine.world.block.items.BlockItemFactory;
 import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.components.InventoryItemComponent;
 import org.terasology.module.inventory.components.StartingInventoryComponent;
 import org.terasology.module.inventory.events.RequestInventoryEvent;
 
@@ -60,18 +61,14 @@ public class StartingInventorySystem extends BaseComponentSystem {
     public void onStartingInventory(OnPlayerSpawnedEvent event,
                                     EntityRef player,
                                     StartingInventoryComponent startingInventory) {
-        entitiesWithoutInventory.clear();
-        addItemsTo(startingInventory.items, player, player.getParentPrefab().getName());
-        player.removeComponent(StartingInventoryComponent.class);
-        logErrors();
+        player.send(new RequestInventoryEvent(startingInventory.items));
     }
 
-    @ReceiveEvent
-    public void onRequestInventory(RequestInventoryEvent event,
-                                   EntityRef player,
-                                   StartingInventoryComponent startingInventory) {
+    @ReceiveEvent(components = InventoryComponent.class)
+    public void onRequestInventory(RequestInventoryEvent event, EntityRef player) {
         entitiesWithoutInventory.clear();
-        addItemsTo(startingInventory.items, player, player.getParentPrefab().getName());
+        addItemsTo(event.items, player, player.getParentPrefab().getName());
+        player.removeComponent(StartingInventoryComponent.class);
         logErrors();
     }
 
@@ -95,7 +92,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param item the inventory item to validate
      * @return true if the item has non-empty URI and quantity greater zero, false otherwise
      */
-    private boolean isValid(StartingInventoryComponent.InventoryItem item) {
+    private boolean isValid(InventoryItemComponent item) {
         if (item.uri == null || item.uri.isEmpty()) {
             logger.warn("Improperly specified starting inventory item: Uri is null");
             return false;
@@ -118,8 +115,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param entity the entity with {@link InventoryComponent} to add the item to
      * @param item the item to add to the entity's inventory
      */
-    private void addToInventory(EntityRef entity,
-                                StartingInventoryComponent.InventoryItem item) {
+    private void addToInventory(EntityRef entity, InventoryItemComponent item) {
 
         //TODO(Java9): Use Optional::or instead (https://docs.oracle.com/javase/9/docs/api/java/util/Optional
         // .html#or-java.util.function.Supplier-)
@@ -141,7 +137,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
     /**
      * Adds all valid objects to this entity if it has an item component.
      * <p>
-     * Inventory objects are valid if {@link #isValid(StartingInventoryComponent.InventoryItem)} holds.
+     * Inventory objects are valid if {@link #isValid(InventoryItemComponent)} holds.
      * <p>
      * If the list of nested items is empty or the entity does not have an inventory component this method does
      * nothing.
@@ -152,7 +148,7 @@ public class StartingInventorySystem extends BaseComponentSystem {
      * @param entity the entity to add the starting inventory objects to
      * @param entityDescriptor a descriptive string (name or Uri) for the entity, used for logging
      */
-    private EntityRef addItemsTo(List<StartingInventoryComponent.InventoryItem> items, EntityRef entity,
+    private EntityRef addItemsTo(List<InventoryItemComponent> items, EntityRef entity,
                                  String entityDescriptor) {
         if (items.isEmpty() || entity.hasComponent(InventoryComponent.class)) {
             items.stream()
