@@ -43,5 +43,5 @@ public class StartingInventoryComponent implements Component {
      * <p>
      * Default is an empty list.
      */
-    public List<InventoryItemComponent> items = Lists.newLinkedList();
+    public List<InventoryItem> items = Lists.newLinkedList();
 }

@@ -3,13 +3,15 @@
 package org.terasology.module.inventory.events;
 
 import org.terasology.engine.entitySystem.event.Event;
-import org.terasology.module.inventory.components.InventoryItemComponent;
+import org.terasology.module.inventory.components.InventoryItem;
 
 import java.util.List;
-
+/**
+ * This event is sent to fill the inventory of a player with the requested items.
+ */
 public class RequestInventoryEvent implements Event {
-    public List<InventoryItemComponent> items;
-    public RequestInventoryEvent(List<InventoryItemComponent> items) {
+    public List<InventoryItem> items;
+    public RequestInventoryEvent(List<InventoryItem> items) {
         this.items = items;
     }
 }

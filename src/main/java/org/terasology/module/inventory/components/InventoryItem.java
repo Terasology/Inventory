@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * A simple class connecting a resource (a {@link Block} or {@link Prefab}) to a quantity
  */
-public class InventoryItemComponent {
+public class InventoryItem {
     /**
      * A resource uri, may be either a block uri or an item uri.
      */
@@ -32,5 +32,5 @@ public class InventoryItemComponent {
      * <p>
      * Default value is the empty list.
      */
-    public List<InventoryItemComponent> items = Lists.newLinkedList();
+    public List<InventoryItem> items = Lists.newLinkedList();
 }
