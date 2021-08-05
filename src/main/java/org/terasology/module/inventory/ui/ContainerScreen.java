@@ -3,11 +3,16 @@
 package org.terasology.module.inventory.ui;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.widgets.UILabel;
+
+import java.util.Optional;
 
 /**
  */
@@ -29,13 +34,27 @@ public class ContainerScreen extends CoreScreenLayer {
         });
         inventory.setCellOffset(10);
 
+        UILabel containerTitle = find("containerTitle", UILabel.class);
         containerInventory = find("container", InventoryGrid.class);
+
+        EntityRef characterEntity = localPlayer.getCharacterEntity();
+        CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
         containerInventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
             @Override
             public EntityRef get() {
-                EntityRef characterEntity = localPlayer.getCharacterEntity();
-                CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
                 return characterComponent.predictedInteractionTarget;
+            }
+        });
+        containerTitle.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Prefab parentPrefab = characterComponent.predictedInteractionTarget.getParentPrefab();
+                DisplayNameComponent displayName = parentPrefab.getComponent(DisplayNameComponent.class);
+                if (displayName != null) {
+                    return displayName.name;
+                } else {
+                    return parentPrefab.getName();
+                }
             }
         });
     }
