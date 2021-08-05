@@ -5,16 +5,40 @@
         "type": "relativeLayout",
         "contents": [
             {
+                "type": "UILabel",
+                "id": "title",
+                "family": "title",
+                "text": "${engine:menu#category-inventory}",
+                "layoutInfo": {
+                    "height": 30,
+                    "use-content-width": true,
+                    "position-vertical-center": {},
+                    "position-left": {
+                        "target": "LEFT",
+                        "widget": "inventory"
+                    }
+                }
+            },
+            {
                 "type": "InventoryGrid",
                 "id": "inventory",
                 "maxHorizontalCells": 10,
                 "layoutInfo": {
                     "use-content-width": true,
-                    "use-content-height": true,
                     "position-horizontal-center": {},
-                    "position-vertical-center": {}
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title",
+                        "offset": 10
+                    }
                 }
             }
-        ]
+        ],
+        "layoutInfo": {
+            "position-horizontal-center": {},
+            "use-content-width": true,
+            "use-content-height": true
+        }
     }
 }
+
