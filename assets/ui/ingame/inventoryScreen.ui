@@ -12,10 +12,14 @@
                 "layoutInfo": {
                     "height": 30,
                     "use-content-width": true,
-                    "position-vertical-center": {},
                     "position-left": {
                         "target": "LEFT",
                         "widget": "inventory"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "inventory",
+                        "offset": 10
                     }
                 }
             },
@@ -25,20 +29,12 @@
                 "maxHorizontalCells": 10,
                 "layoutInfo": {
                     "use-content-width": true,
+                    "use-content-height": true,
                     "position-horizontal-center": {},
-                    "position-top": {
-                        "target": "BOTTOM",
-                        "widget": "title",
-                        "offset": 10
-                    }
+                    "position-vertical-center": {}
                 }
             }
-        ],
-        "layoutInfo": {
-            "position-horizontal-center": {},
-            "use-content-width": true,
-            "use-content-height": true
-        }
+        ]
     }
 }
 
