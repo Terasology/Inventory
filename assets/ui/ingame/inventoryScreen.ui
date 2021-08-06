@@ -5,6 +5,25 @@
         "type": "relativeLayout",
         "contents": [
             {
+                "type": "UILabel",
+                "id": "title",
+                "family": "title",
+                "text": "${engine:menu#category-inventory}",
+                "layoutInfo": {
+                    "height": 30,
+                    "use-content-width": true,
+                    "position-left": {
+                        "target": "LEFT",
+                        "widget": "inventory"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "inventory",
+                        "offset": 10
+                    }
+                }
+            },
+            {
                 "type": "InventoryGrid",
                 "id": "inventory",
                 "maxHorizontalCells": 10,
@@ -18,3 +37,4 @@
         ]
     }
 }
+
