@@ -4,15 +4,14 @@ package org.terasology.module.inventory.ui;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.prefab.Prefab;
+import org.terasology.engine.i18n.TranslationSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
-
-import java.util.Optional;
 
 /**
  */
@@ -20,6 +19,9 @@ public class ContainerScreen extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
+
+    @In
+    private TranslationSystem i18n;
 
     private InventoryGrid containerInventory;
 
@@ -50,7 +52,10 @@ public class ContainerScreen extends CoreScreenLayer {
                 Prefab parentPrefab = characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget.getParentPrefab();
                 DisplayNameComponent displayName = parentPrefab.getComponent(DisplayNameComponent.class);
                 if (displayName != null) {
-                    return displayName.name;
+                    // The display name may contain a translatable string reference, thus we attempt to get the translation.
+                    // If the string is just non-translatable display name the fallback mechanism will yield just the input string.
+                    // NOTE: Unfortunately, this contract is not guaranteed by `TranslationSystem#translate(String)`.
+                    return i18n.translate(displayName.name);
                 } else {
                     return parentPrefab.getName();
                 }

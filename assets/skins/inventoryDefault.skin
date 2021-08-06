@@ -39,9 +39,9 @@
         }
     },
     "families": {
-        "title":{
+        "title": {
             "font":"NotoSans-Regular-Medium",
-			"text-align-horizontal": "left"
+            "text-align-horizontal": "left"
         }
     }
 }
