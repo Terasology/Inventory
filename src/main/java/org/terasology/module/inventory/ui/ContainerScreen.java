@@ -38,17 +38,16 @@ public class ContainerScreen extends CoreScreenLayer {
         containerInventory = find("container", InventoryGrid.class);
 
         EntityRef characterEntity = localPlayer.getCharacterEntity();
-        CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
         containerInventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
             @Override
             public EntityRef get() {
-                return characterComponent.predictedInteractionTarget;
+                return characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget;
             }
         });
         containerTitle.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                Prefab parentPrefab = characterComponent.predictedInteractionTarget.getParentPrefab();
+                Prefab parentPrefab = characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget.getParentPrefab();
                 DisplayNameComponent displayName = parentPrefab.getComponent(DisplayNameComponent.class);
                 if (displayName != null) {
                     return displayName.name;
