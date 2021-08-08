@@ -14,6 +14,7 @@ import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
 
 /**
+ * A UI screen to show a container inventory next to the player's inventory.
  */
 public class ContainerScreen extends CoreScreenLayer {
 
@@ -22,8 +23,6 @@ public class ContainerScreen extends CoreScreenLayer {
 
     @In
     private TranslationSystem i18n;
-
-    private InventoryGrid containerInventory;
 
     @Override
     public void initialise() {
@@ -37,19 +36,18 @@ public class ContainerScreen extends CoreScreenLayer {
         inventory.setCellOffset(10);
 
         UILabel containerTitle = find("containerTitle", UILabel.class);
-        containerInventory = find("container", InventoryGrid.class);
+        InventoryGrid containerInventory = find("container", InventoryGrid.class);
 
-        EntityRef characterEntity = localPlayer.getCharacterEntity();
         containerInventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
             @Override
             public EntityRef get() {
-                return characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget;
+                return getPredictedInteractionTarget();
             }
         });
         containerTitle.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                Prefab parentPrefab = characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget.getParentPrefab();
+                Prefab parentPrefab = getPredictedInteractionTarget().getParentPrefab();
                 DisplayNameComponent displayName = parentPrefab.getComponent(DisplayNameComponent.class);
                 if (displayName != null) {
                     // The display name may contain a translatable string reference, thus we attempt to get the translation.
@@ -61,6 +59,14 @@ public class ContainerScreen extends CoreScreenLayer {
                 }
             }
         });
+    }
+
+    /**
+     * Retrieve the predicted interaction target entity for the local player.
+     */
+    private EntityRef getPredictedInteractionTarget() {
+        EntityRef characterEntity = localPlayer.getCharacterEntity();
+        return characterEntity.getComponent(CharacterComponent.class).predictedInteractionTarget;
     }
 
     @Override
