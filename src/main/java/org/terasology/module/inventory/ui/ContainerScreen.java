@@ -13,6 +13,8 @@ import org.terasology.engine.rendering.nui.CoreScreenLayer;
 import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.nui.widgets.UILabel;
 
+import java.util.Optional;
+
 /**
  * A UI screen to show a container inventory next to the player's inventory.
  */
@@ -47,16 +49,19 @@ public class ContainerScreen extends CoreScreenLayer {
         containerTitle.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                Prefab parentPrefab = getPredictedInteractionTarget().getParentPrefab();
-                DisplayNameComponent displayName = parentPrefab.getComponent(DisplayNameComponent.class);
-                if (displayName != null) {
-                    // The display name may contain a translatable string reference, thus we attempt to get the translation.
-                    // If the string is just non-translatable display name the fallback mechanism will yield just the input string.
-                    // NOTE: Unfortunately, this contract is not guaranteed by `TranslationSystem#translate(String)`.
-                    return i18n.translate(displayName.name);
-                } else {
-                    return parentPrefab.getName();
-                }
+                EntityRef interactionTarget = getPredictedInteractionTarget();
+
+                String name = Optional.ofNullable(interactionTarget.getComponent(DisplayNameComponent.class))
+                        .map(displayName -> displayName.name)
+                        .orElseGet(() ->
+                                Optional.ofNullable(interactionTarget.getParentPrefab())
+                                        .map(Prefab::getName)
+                                        .orElse(""));
+
+                // The display name may contain a translatable string reference, thus we attempt to get the translation.
+                // If the string is just non-translatable display name the fallback mechanism will yield just the input string.
+                // NOTE: Unfortunately, this contract is not guaranteed by `TranslationSystem#translate(String)`.
+                return i18n.translate(name);
             }
         });
     }
