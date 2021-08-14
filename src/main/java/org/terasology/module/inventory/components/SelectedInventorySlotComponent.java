@@ -10,7 +10,7 @@ public class SelectedInventorySlotComponent implements Component<SelectedInvento
     public int slot;
 
     @Override
-    public void copy(SelectedInventorySlotComponent other) {
+    public void copyFrom(SelectedInventorySlotComponent other) {
         this.slot = other.slot;
     }
 }

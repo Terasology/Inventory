@@ -49,7 +49,7 @@ public class StartingInventoryComponent implements Component<StartingInventoryCo
     public List<InventoryItem> items = Lists.newLinkedList();
 
     @Override
-    public void copy(StartingInventoryComponent other) {
+    public void copyFrom(StartingInventoryComponent other) {
         this.items = other.items.stream().map(InventoryItem::copy).collect(Collectors.toList());
     }
 

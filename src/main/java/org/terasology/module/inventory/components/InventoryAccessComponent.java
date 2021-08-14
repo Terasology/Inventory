@@ -12,7 +12,7 @@ public class InventoryAccessComponent implements Component<InventoryAccessCompon
     public Map<String, IntegerRange> output;
 
     @Override
-    public void copy(InventoryAccessComponent other) {
+    public void copyFrom(InventoryAccessComponent other) {
         for (Map.Entry<String, IntegerRange> entry : other.input.entrySet()) {
             this.input.put(entry.getKey(), entry.getValue().copy());
         }
