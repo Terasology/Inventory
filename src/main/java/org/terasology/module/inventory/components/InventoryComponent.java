@@ -4,14 +4,14 @@
 package org.terasology.module.inventory.components;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.entitySystem.Component;
 import org.terasology.engine.entitySystem.Owns;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.network.Replicate;
 import org.terasology.engine.network.ReplicationCheck;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.world.block.ForceBlockActive;
 import org.terasology.engine.world.block.items.AddToBlockBasedItem;
+import org.terasology.gestalt.entitysystem.component.Component;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @ForceBlockActive
 @AddToBlockBasedItem
-public final class InventoryComponent implements Component, ReplicationCheck {
+public final class InventoryComponent implements Component<InventoryComponent>, ReplicationCheck {
 
     public boolean privateToOwner = true;
 
@@ -40,5 +40,11 @@ public final class InventoryComponent implements Component, ReplicationCheck {
     @Override
     public boolean shouldReplicate(FieldMetadata<?, ?> field, boolean initial, boolean toOwner) {
         return !privateToOwner || toOwner;
+    }
+
+    @Override
+    public void copyFrom(InventoryComponent other) {
+        this.itemSlots = Lists.newArrayList(other.itemSlots);
+        this.privateToOwner = other.privateToOwner;
     }
 }

@@ -7,6 +7,7 @@ import org.terasology.engine.entitySystem.prefab.Prefab;
 import org.terasology.engine.world.block.Block;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple class connecting a resource (a {@link Block} or {@link Prefab}) to a quantity
@@ -33,4 +34,15 @@ public class InventoryItem {
      * Default value is the empty list.
      */
     public List<InventoryItem> items = Lists.newLinkedList();
+
+    /**
+     * Create a deep copy of this inventory item.
+     */
+    InventoryItem copy() {
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.uri = this.uri;
+        inventoryItem.quantity = this.quantity;
+        inventoryItem.items = this.items.stream().map(InventoryItem::copy).collect(Collectors.toList());
+        return inventoryItem;
+    }
 }
