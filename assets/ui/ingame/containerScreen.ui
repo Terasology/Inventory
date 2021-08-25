@@ -5,17 +5,21 @@
         "type": "relativeLayout",
         "contents": [
             {
-                "type": "InventoryGrid",
-                "id": "inventory",
-                "maxHorizontalCells": 10,
+                "type": "UILabel",
+                "id": "containerTitle",
+                "family": "title",
                 "layoutInfo": {
+                    "height": 30,
                     "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "target": "BOTTOM",
-                        "offset": 128
+                    "position-left": {
+                        "target": "LEFT",
+                        "widget": "container"
                     },
-                    "position-horizontal-center": {}
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "container",
+                        "offset": 10
+                    }
                 }
             },
             {
@@ -25,12 +29,42 @@
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,
-                    "position-bottom": {
-                        "target": "TOP",
-                        "widget": "inventory",
-                        "offset": 16
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "inventoryTitle",
+                "family": "title",
+                "text": "${engine:menu#category-inventory}",
+                "layoutInfo": {
+                    "height": 30,
+                    "use-content-width": true,
+                    "position-left": {
+                        "target": "LEFT",
+                        "widget": "container"
                     },
-                    "position-horizontal-center": {}
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "container",
+                        "offset": 16
+                    }
+                }
+            },
+            {
+                "type": "InventoryGrid",
+                "id": "inventory",
+                "maxHorizontalCells": 10,
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "inventoryTitle",
+                        "offset": 10
+                    }
                 }
             }
         ]
