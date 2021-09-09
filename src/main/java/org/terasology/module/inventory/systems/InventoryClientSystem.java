@@ -3,13 +3,13 @@
 package org.terasology.module.inventory.systems;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.events.AbstractMoveItemRequest;
 import org.terasology.module.inventory.events.InventoryChangeAcknowledgedRequest;
