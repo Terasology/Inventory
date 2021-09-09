@@ -3,9 +3,6 @@
 package org.terasology.module.inventory.systems;
 
 import org.joml.Vector3f;
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.components.DropBlockInventoryComponent;
-import org.terasology.module.inventory.components.RetainBlockInventoryComponent;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
@@ -22,6 +19,9 @@ import org.terasology.engine.utilities.random.FastRandom;
 import org.terasology.engine.world.block.items.BlockItemComponent;
 import org.terasology.engine.world.block.items.OnBlockItemPlaced;
 import org.terasology.engine.world.block.items.OnBlockToItem;
+import org.terasology.module.inventory.components.DropBlockInventoryComponent;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.components.RetainBlockInventoryComponent;
 
 /**
  */

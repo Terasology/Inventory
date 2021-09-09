@@ -4,23 +4,24 @@ package org.terasology.module.inventory.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
+import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.input.InventoryButton;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.ClientComponent;
-import org.terasology.nui.ControlWidget;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.gestalt.assets.ResourceUrn;
+import org.terasology.input.ButtonState;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.input.InventoryButton;
+import org.terasology.nui.ControlWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,8 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
      * The close of the dialog triggers {@link #onScreenLayerClosed} which resets the
      * interactionTarget.
      */
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @Priority(EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity, ClientComponent clientComponent) {
         if (event.getState() != ButtonState.DOWN) {
             return;
