@@ -7,29 +7,17 @@ import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.events.MoveItemAction;
-import org.terasology.module.inventory.events.SwitchItemAction;
-import org.terasology.module.inventory.events.AbstractMoveItemRequest;
-import org.terasology.module.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.module.inventory.events.MoveItemAmountRequest;
-import org.terasology.module.inventory.events.MoveItemRequest;
-import org.terasology.module.inventory.events.MoveItemToSlotsRequest;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.events.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 @Share(value = InventoryManager.class)
 public class InventoryClientSystem extends BaseComponentSystem implements InventoryManager {
-
     @In
     private LocalPlayer localPlayer;
 
