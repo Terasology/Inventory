@@ -15,6 +15,11 @@
       "id": "ModuleTestingEnvironment",
       "minVersion": "0.3.0",
       "optional": true
+    },
+    {
+      "id": "Notifications",
+      "minVersion": "0.1.0",
+      "maxVersion": "0.3.0"
     }
   ],
   "isLibrary": true,
