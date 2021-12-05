@@ -3,21 +3,21 @@
 package org.terasology.module.inventory.systems;
 
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.events.MoveItemAction;
-import org.terasology.module.inventory.events.SwitchItemAction;
-import org.terasology.module.inventory.events.AbstractMoveItemRequest;
-import org.terasology.module.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.module.inventory.events.MoveItemAmountRequest;
-import org.terasology.module.inventory.events.MoveItemRequest;
-import org.terasology.module.inventory.events.MoveItemToSlotsRequest;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.registry.Share;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.events.AbstractMoveItemRequest;
+import org.terasology.module.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.module.inventory.events.MoveItemAction;
+import org.terasology.module.inventory.events.MoveItemAmountRequest;
+import org.terasology.module.inventory.events.MoveItemRequest;
+import org.terasology.module.inventory.events.MoveItemToSlotsRequest;
+import org.terasology.module.inventory.events.SwitchItemAction;
 
 import java.util.Collection;
 import java.util.HashSet;

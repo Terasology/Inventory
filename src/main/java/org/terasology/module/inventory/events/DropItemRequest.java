@@ -6,8 +6,8 @@ package org.terasology.module.inventory.events;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.entitySystem.event.Event;
 import org.terasology.engine.network.ServerEvent;
+import org.terasology.gestalt.entitysystem.event.Event;
 
 /**
  * A request for a player to drop an item. Is replicated onto the server

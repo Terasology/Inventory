@@ -9,24 +9,17 @@ import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.engine.entitySystem.event.ReceiveEvent;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
+import org.terasology.engine.entitySystem.systems.NetFilterEvent;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
-import org.terasology.module.inventory.input.DropItemButton;
-import org.terasology.module.inventory.input.ToolbarNextButton;
-import org.terasology.module.inventory.input.ToolbarPrevButton;
-import org.terasology.module.inventory.input.ToolbarSlotButton;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.CharacterHeldItemComponent;
 import org.terasology.engine.logic.characters.events.ChangeHeldItemRequest;
 import org.terasology.engine.logic.characters.events.PlayerDeathEvent;
 import org.terasology.engine.logic.inventory.PickupComponent;
-import org.terasology.module.inventory.events.ChangeSelectedInventorySlotRequest;
 import org.terasology.engine.logic.inventory.events.DropItemEvent;
-import org.terasology.module.inventory.events.DropItemRequest;
 import org.terasology.engine.logic.inventory.events.GiveItemEvent;
-import org.terasology.module.inventory.events.InventorySlotChangedEvent;
 import org.terasology.engine.logic.location.LocationComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
 import org.terasology.engine.network.NetworkSystem;
@@ -36,10 +29,18 @@ import org.terasology.engine.physics.StandardCollisionGroup;
 import org.terasology.engine.physics.events.ImpulseEvent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.utilities.Assets;
+import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.components.SelectedInventorySlotComponent;
+import org.terasology.module.inventory.events.ChangeSelectedInventorySlotRequest;
+import org.terasology.module.inventory.events.DropItemRequest;
+import org.terasology.module.inventory.events.InventorySlotChangedEvent;
+import org.terasology.module.inventory.input.DropItemButton;
+import org.terasology.module.inventory.input.ToolbarNextButton;
+import org.terasology.module.inventory.input.ToolbarPrevButton;
+import org.terasology.module.inventory.input.ToolbarSlotButton;
 import org.terasology.module.inventory.ui.InventoryHud;
-import org.terasology.engine.utilities.Assets;
 
 @RegisterSystem
 public class CharacterInventorySystem extends BaseComponentSystem {
@@ -68,14 +69,16 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     private long lastInteraction;
     private long lastTimeThrowInteraction;
 
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent
     public void ensureTransferSlotIsCreated(OnAddedComponent event, EntityRef entityRef, CharacterComponent characterComponent) {
         EntityRef transferSlot = entityManager.create("Inventory:transferSlot");
         characterComponent.movingItem = transferSlot;
         entityRef.saveComponent(characterComponent);
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent
     public void syncSelectedSlotWithHeldItem(InventorySlotChangedEvent event, EntityRef entityRef,
                                              SelectedInventorySlotComponent selectedInventorySlotComponent) {
         if (selectedInventorySlotComponent.slot == event.getSlot()) {
@@ -83,7 +86,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent
     public void onChangeSelectedInventorySlotRequested(ChangeSelectedInventorySlotRequest request, EntityRef character,
                                                        SelectedInventorySlotComponent selectedInventorySlotComponent) {
         if (request.getSlot() >= 0 && request.getSlot() < 10 && request.getSlot() != selectedInventorySlotComponent.slot) {
@@ -94,7 +98,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {
         //make sure we own the item and it exists
         if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
@@ -123,27 +128,31 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         pickupItem.send(new ImpulseEvent(event.getImpulse()));
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onNextItem(ToolbarNextButton event, EntityRef entity, SelectedInventorySlotComponent selectedInventorySlotComponent) {
         int nextSlot = (selectedInventorySlotComponent.slot + 1) % 10;
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(nextSlot));
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity, SelectedInventorySlotComponent selectedInventorySlotComponent) {
         int prevSlot = (selectedInventorySlotComponent.slot + 9) % 10;
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(prevSlot));
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = CharacterComponent.class)
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
         localPlayer.getCharacterEntity().send(new ChangeSelectedInventorySlotRequest(event.getSlot()));
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class}, netFilter = RegisterMode.CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onDropItemRequest(DropItemButton event, EntityRef entity) {
         CharacterHeldItemComponent characterHeldItemComponent = entity.getComponent(CharacterHeldItemComponent.class);
         EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
@@ -216,7 +225,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     }
 
 
-    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
+    @ReceiveEvent
     public void onGiveItemToEntity(GiveItemEvent event, EntityRef entity) {
         if (event.getTargetEntity().hasComponent(InventoryComponent.class)) {
             if (inventoryManager.giveItem(event.getTargetEntity(), entity, entity)) {
@@ -226,7 +236,8 @@ public class CharacterInventorySystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(netFilter = RegisterMode.CLIENT)
+    @NetFilterEvent(netFilter = RegisterMode.CLIENT)
+    @ReceiveEvent
     public void onPlayerDeath(PlayerDeathEvent event, EntityRef entity) {
         resetDropMark();
     }
