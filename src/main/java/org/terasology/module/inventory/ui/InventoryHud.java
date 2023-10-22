@@ -73,7 +73,7 @@ public class InventoryHud extends CoreHudWidget {
         private int offset;
         private LocalPlayer localPlayer;
 
-        public TargetSlotBinding(int targetSlot, LocalPlayer localPlayer) {
+        TargetSlotBinding(int targetSlot, LocalPlayer localPlayer) {
             this.offset = targetSlot;
             this.localPlayer = localPlayer;
         }
