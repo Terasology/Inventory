@@ -3,8 +3,6 @@
 package org.terasology.module.inventory.components;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.entitySystem.prefab.Prefab;
-import org.terasology.engine.world.block.Block;
 import org.terasology.gestalt.entitysystem.component.Component;
 
 import java.util.List;
