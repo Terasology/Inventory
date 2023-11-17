@@ -8,8 +8,6 @@ import org.terasology.engine.network.ServerEvent;
 
 import java.util.Collection;
 
-/**
- */
 @ServerEvent
 public class MoveItemRequest extends AbstractMoveItemRequest {
     private int toSlot;

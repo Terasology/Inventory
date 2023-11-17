@@ -4,8 +4,6 @@ package org.terasology.module.inventory.events;
 
 import org.terasology.gestalt.entitysystem.event.Event;
 
-/**
- */
 public class InventorySlotStackSizeChangedEvent implements Event {
     private int slot;
     private int oldSize;

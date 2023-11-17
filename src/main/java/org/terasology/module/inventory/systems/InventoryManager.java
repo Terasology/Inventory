@@ -7,8 +7,6 @@ import org.terasology.engine.entitySystem.entity.EntityRef;
 
 import java.util.List;
 
-/**
- */
 public interface InventoryManager {
 
     /**

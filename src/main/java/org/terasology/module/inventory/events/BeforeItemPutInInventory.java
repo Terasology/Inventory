@@ -5,8 +5,6 @@ package org.terasology.module.inventory.events;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 
-/**
- */
 public class BeforeItemPutInInventory extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef item;
