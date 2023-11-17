@@ -31,10 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
-@Share(value = InventoryManager.class)
+@Share(InventoryManager.class)
 public class InventoryAuthoritySystem extends BaseComponentSystem implements InventoryManager {
     @In
     private EntityManager entityManager;
@@ -43,19 +41,20 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
         this.entityManager = entityManager;
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void switchItem(SwitchItemAction event, EntityRef entity) {
         switchItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo());
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void moveItem(MoveItemAction event, EntityRef entity) {
         moveItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void removeItem(RemoveItemAction event, EntityRef entity) {
-        final EntityRef result = removeItemInternal(entity, event.getInstigator(), event.getItems(), event.isDestroyRemoved(), event.getCount());
+        final EntityRef result = removeItemInternal(entity, event.getInstigator(), event.getItems(), event.isDestroyRemoved(),
+                event.getCount());
         if (result != null) {
             if (result != EntityRef.NULL) {
                 event.setRemovedItem(result);
@@ -64,7 +63,8 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
         }
     }
 
-    private EntityRef removeItemFromSlots(EntityRef instigator, boolean destroyRemoved, EntityRef entity, List<Integer> slotsWithItem, int toRemove) {
+    private EntityRef removeItemFromSlots(EntityRef instigator, boolean destroyRemoved, EntityRef entity, List<Integer> slotsWithItem,
+                                          int toRemove) {
         int shrinkSlotNo = -1;
         int shrinkCountResult = 0;
 
@@ -138,7 +138,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
         return EntityRef.NULL;
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void giveItem(GiveItemAction event, EntityRef entity) {
         if (giveItem(entity, event.getInstigator(), event.getItem(), event.getSlots())) {
             event.consume();
