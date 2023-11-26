@@ -4,7 +4,5 @@ package org.terasology.module.inventory.components;
 
 import org.terasology.gestalt.entitysystem.component.EmptyComponent;
 
-/**
- */
 public final class RetainBlockInventoryComponent extends EmptyComponent<RetainBlockInventoryComponent> {
 }

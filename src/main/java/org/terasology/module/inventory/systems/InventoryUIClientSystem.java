@@ -31,11 +31,11 @@ import java.util.stream.IntStream;
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(InventoryUIClientSystem.class);
+
     EntityRef movingItemItem = EntityRef.NULL;
 
     int movingItemCount = 0;
-
-    private static final Logger logger = LoggerFactory.getLogger(InventoryUIClientSystem.class);
 
     @In
     private NUIManager nuiManager;

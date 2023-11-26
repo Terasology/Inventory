@@ -283,9 +283,7 @@ public class ItemCommands extends BaseComponentSystem {
         }
 
         if (result == null) {
-            logger.debug("Could not remove  \""
-                    + displayName
-                    + "\" from slot " + slot.getId());
+            logger.debug("Could not remove \"{}\" from slot {}", displayName, slot.getId());
         }
 
         return quantityLeft;

@@ -23,8 +23,6 @@ import org.terasology.module.inventory.components.DropBlockInventoryComponent;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.components.RetainBlockInventoryComponent;
 
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockInventorySystem extends BaseComponentSystem {
 

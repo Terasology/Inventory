@@ -5,7 +5,6 @@ package org.terasology.module.inventory.systems;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.terasology.module.inventory.systems.InventoryAuthoritySystem;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
@@ -30,8 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
 
-/**
- */
 public class InventoryAuthoritySystemTest {
     private InventoryAuthoritySystem inventoryAuthoritySystem;
     private EntityRef instigator;

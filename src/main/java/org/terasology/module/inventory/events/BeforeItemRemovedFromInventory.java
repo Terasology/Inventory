@@ -5,8 +5,6 @@ package org.terasology.module.inventory.events;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.AbstractConsumableEvent;
 
-/**
- */
 public class BeforeItemRemovedFromInventory extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef item;

@@ -27,29 +27,29 @@ import java.util.Map;
 import java.util.Set;
 
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
-@Share(value = InventoryManager.class)
+@Share(InventoryManager.class)
 public class InventoryClientSystem extends BaseComponentSystem implements InventoryManager {
 
     @In
     private LocalPlayer localPlayer;
 
-    private Map<Integer, AbstractMoveItemRequest> pendingMoves = new LinkedHashMap<>();
+    private final Map<Integer, AbstractMoveItemRequest> pendingMoves = new LinkedHashMap<>();
 
     private int changeId;
 
     // We support only these two events on the client, as these are the events used by inventory UI
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void switchItemRequest(SwitchItemAction event, EntityRef entity) {
         switchItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo());
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void moveItemRequest(MoveItemAction event, EntityRef entity) {
         moveItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent(components = InventoryComponent.class)
     public void inventoryChangeAcknowledge(InventoryChangeAcknowledgedRequest event, EntityRef entity) {
         //TODO: This does not ever get triggered because the event is sent to the client,  not the character.
         //      If it did get triggered,  it causes a mess of question mark items.
