@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public final class InventoryUtils {
     private InventoryUtils() {
     }
@@ -237,7 +235,8 @@ public final class InventoryUtils {
             return false;
         }
 
-        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, InventoryUtils.getItemAt(from, slotFrom), slotFrom);
+        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator,
+                InventoryUtils.getItemAt(from, slotFrom), slotFrom);
         from.send(removeFrom);
         if (removeFrom.isConsumed()) {
             return false;

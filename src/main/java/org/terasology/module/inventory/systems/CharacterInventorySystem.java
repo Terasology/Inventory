@@ -228,11 +228,10 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     @NetFilterEvent(netFilter = RegisterMode.AUTHORITY)
     @ReceiveEvent
     public void onGiveItemToEntity(GiveItemEvent event, EntityRef entity) {
-        if (event.getTargetEntity().hasComponent(InventoryComponent.class)) {
-            if (inventoryManager.giveItem(event.getTargetEntity(), entity, entity)) {
-                event.getTargetEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot").get(), 1.0f));
-                event.setHandled(true);
-            }
+        if (event.getTargetEntity().hasComponent(InventoryComponent.class)
+                && inventoryManager.giveItem(event.getTargetEntity(), entity, entity)) {
+            event.getTargetEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot").get(), 1.0f));
+            event.setHandled(true);
         }
     }
 

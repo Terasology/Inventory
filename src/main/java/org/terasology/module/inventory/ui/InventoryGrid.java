@@ -39,8 +39,8 @@ public class InventoryGrid extends CoreWidget {
     /**
      * Defines the first inventory slot index to which an InventoryGrid should refer to.
      *
-     * Example: If an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
-     * Other slots will be not accessible by this InventoryGrid.
+     * Example: If an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from
+     * zero). Other slots will be not accessible by this InventoryGrid.
      */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
@@ -49,7 +49,8 @@ public class InventoryGrid extends CoreWidget {
      * Defines the maximum amount of cells in an InventoryGrid.
      * Used together with cellOffset, it allows developers to provide access to parts of an entity's inventory.
      *
-     * Example: If an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
+     * Example: If an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn,
+     * starting from slot no. 5 and ending at cell no. 14 (starting from zero).
      */
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);

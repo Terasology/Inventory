@@ -5,8 +5,6 @@ package org.terasology.module.inventory.events;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.gestalt.entitysystem.event.Event;
 
-/**
- */
 public class InventorySlotChangedEvent implements Event {
     private int slot;
     private EntityRef oldItem;

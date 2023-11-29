@@ -10,8 +10,6 @@ import org.terasology.gestalt.entitysystem.event.Event;
 
 import java.util.Collection;
 
-/**
- */
 @ServerEvent
 public abstract class AbstractMoveItemRequest implements Event {
     private EntityRef instigator;
