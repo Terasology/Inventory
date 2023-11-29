@@ -10,11 +10,6 @@
       "id": "CoreAssets",
       "minVersion": "2.0.0",
       "optional": true
-    },
-    {
-      "id": "ModuleTestingEnvironment",
-      "minVersion": "0.2.0-SNAPSHOT",
-      "optional": true
     }
   ],
   "isLibrary": true,
