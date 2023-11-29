@@ -1,5 +1,6 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
 import com.google.common.primitives.UnsignedBytes;
@@ -7,18 +8,18 @@ import org.joml.Vector2i;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.common.DisplayNameComponent;
 import org.terasology.engine.logic.inventory.ItemComponent;
-import org.terasology.nui.Canvas;
-import org.terasology.nui.CoreWidget;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.DefaultBinding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.LayoutConfig;
-import org.terasology.nui.widgets.TooltipLine;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.texture.Texture;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.nui.Canvas;
+import org.terasology.nui.CoreWidget;
+import org.terasology.nui.LayoutConfig;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.TooltipLine;
 
 import java.util.List;
 import java.util.Optional;

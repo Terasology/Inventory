@@ -1,18 +1,19 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
-import org.terasology.module.inventory.systems.InventoryUtils;
 import org.terasology.engine.entitySystem.entity.EntityRef;
-import org.terasology.engine.rendering.nui.layers.hud.CoreHudWidget;
-import org.terasology.input.MouseInput;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.In;
+import org.terasology.engine.rendering.nui.layers.hud.CoreHudWidget;
+import org.terasology.input.MouseInput;
+import org.terasology.module.inventory.systems.InventoryUtils;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
 import org.terasology.nui.events.NUIMouseClickEvent;
-import org.terasology.engine.registry.In;
 
 /**
  * A region/layer around the inventory grid to allow players to get rid of extra items

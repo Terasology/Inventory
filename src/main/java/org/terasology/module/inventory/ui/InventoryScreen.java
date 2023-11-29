@@ -1,19 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.systems.InventoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.module.inventory.systems.InventoryManager;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.nui.databinding.ReadOnlyBinding;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.CoreScreenLayer;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.systems.InventoryManager;
+import org.terasology.module.inventory.systems.InventoryUtils;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 
 import java.util.ArrayList;
 import java.util.List;

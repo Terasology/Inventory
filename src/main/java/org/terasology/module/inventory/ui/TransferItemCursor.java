@@ -1,23 +1,24 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
 import com.google.common.primitives.UnsignedBytes;
-import org.terasology.module.inventory.systems.InventoryUtils;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.inventory.ItemComponent;
 import org.terasology.engine.logic.players.LocalPlayer;
-import org.terasology.nui.ControlWidget;
-import org.terasology.nui.databinding.Binding;
-import org.terasology.nui.databinding.DefaultBinding;
-import org.terasology.nui.databinding.ReadOnlyBinding;
-import org.terasology.nui.widgets.CursorAttachment;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.assets.mesh.Mesh;
 import org.terasology.engine.rendering.assets.texture.TextureRegion;
 import org.terasology.engine.utilities.Assets;
 import org.terasology.engine.world.block.items.BlockItemComponent;
+import org.terasology.module.inventory.systems.InventoryUtils;
+import org.terasology.nui.ControlWidget;
+import org.terasology.nui.databinding.Binding;
+import org.terasology.nui.databinding.DefaultBinding;
+import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.nui.widgets.CursorAttachment;
 
 public class TransferItemCursor extends CursorAttachment implements ControlWidget {
 

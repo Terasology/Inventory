@@ -1,18 +1,20 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
-import org.terasology.module.inventory.components.InventoryComponent;
-import org.terasology.module.inventory.systems.InventoryManager;
-import org.terasology.module.inventory.systems.InventoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.entitySystem.entity.EntityRef;
+import org.terasology.engine.logic.characters.CharacterComponent;
+import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.CoreRegistry;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.engine.logic.characters.CharacterComponent;
-import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.module.inventory.components.InventoryComponent;
+import org.terasology.module.inventory.systems.InventoryManager;
+import org.terasology.module.inventory.systems.InventoryUtils;
 import org.terasology.nui.BaseInteractionListener;
 import org.terasology.nui.Canvas;
 import org.terasology.nui.InteractionListener;
@@ -21,7 +23,6 @@ import org.terasology.nui.databinding.Binding;
 import org.terasology.nui.databinding.DefaultBinding;
 import org.terasology.nui.events.NUIMouseClickEvent;
 import org.terasology.nui.events.NUIMouseWheelEvent;
-import org.terasology.engine.registry.CoreRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

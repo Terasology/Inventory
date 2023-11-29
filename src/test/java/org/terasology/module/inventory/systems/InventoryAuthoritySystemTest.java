@@ -1,30 +1,30 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.systems;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.engine.entitySystem.entity.EntityManager;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.inventory.ItemComponent;
-import org.terasology.module.inventory.events.GiveItemAction;
-import org.terasology.module.inventory.events.RemoveItemAction;
+import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.events.BeforeItemPutInInventory;
 import org.terasology.module.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.module.inventory.events.GiveItemAction;
 import org.terasology.module.inventory.events.InventorySlotChangedEvent;
 import org.terasology.module.inventory.events.InventorySlotStackSizeChangedEvent;
+import org.terasology.module.inventory.events.RemoveItemAction;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;

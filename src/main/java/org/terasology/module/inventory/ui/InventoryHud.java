@@ -1,16 +1,17 @@
 // Copyright 2021 The Terasology Foundation
 // SPDX-License-Identifier: Apache-2.0
+
 package org.terasology.module.inventory.ui;
 
-import org.terasology.module.inventory.components.SelectedInventorySlotComponent;
 import org.terasology.engine.core.Time;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.layers.hud.CoreHudWidget;
 import org.terasology.engine.rendering.nui.layers.hud.UICrosshair;
-import org.terasology.nui.databinding.ReadOnlyBinding;
+import org.terasology.module.inventory.components.SelectedInventorySlotComponent;
 import org.terasology.nui.LayoutConfig;
-import org.terasology.engine.registry.In;
+import org.terasology.nui.databinding.ReadOnlyBinding;
 
 public class InventoryHud extends CoreHudWidget {
 
