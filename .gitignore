@@ -12,6 +12,8 @@ build.gradle
 bin/
 
 build/
+# TODO, the test log file should not end up within the source directory, ignore so it does not get committed.
+/src/test/resources/logback-test.xml
 
 # MacOS Specific
 .DS_Store
