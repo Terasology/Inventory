@@ -4,4 +4,4 @@
 @API
 package org.terasology.module.inventory.ui;
 
-import org.terasology.context.annotation.API;
+import org.terasology.gestalt.module.sandbox.API;
