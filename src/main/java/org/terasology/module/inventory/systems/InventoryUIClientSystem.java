@@ -47,6 +47,18 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    public void setNuiManager(NUIManager nuiManager) {
+        this.nuiManager = nuiManager;
+    }
+
+    public void setInventoryManager(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
+    }
+
+    public void setLocalPlayer(LocalPlayer localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("inventoryHud");
