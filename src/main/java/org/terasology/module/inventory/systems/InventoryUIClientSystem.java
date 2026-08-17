@@ -86,6 +86,22 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
 
+    /**
+     * Explicit/shutdown saves ({@code ReadWriteStorageManager.startSaving()}) call {@link #preSave()}/
+     * {@link #postSave()}, not {@link #preAutoSave()}/{@link #postAutoSave()} - so without these overrides too,
+     * whatever the player currently has on their cursor (mid drag-and-drop) would stay parked in the transient
+     * transfer slot through a shutdown save and never make it into the persisted inventory at all.
+     */
+    @Override
+    public void preSave() {
+        preAutoSave();
+    }
+
+    @Override
+    public void postSave() {
+        postAutoSave();
+    }
+
     @Override
     public void preAutoSave() {
         /*
