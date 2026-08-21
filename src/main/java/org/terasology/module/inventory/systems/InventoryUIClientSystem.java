@@ -47,6 +47,18 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    public void setNuiManager(NUIManager nuiManager) {
+        this.nuiManager = nuiManager;
+    }
+
+    public void setInventoryManager(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
+    }
+
+    public void setLocalPlayer(LocalPlayer localPlayer) {
+        this.localPlayer = localPlayer;
+    }
+
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("inventoryHud");
@@ -84,6 +96,22 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
 
     private EntityRef getTransferEntity() {
         return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
+    }
+
+    /**
+     * Explicit/shutdown saves ({@code ReadWriteStorageManager.startSaving()}) call {@link #preSave()}/
+     * {@link #postSave()}, not {@link #preAutoSave()}/{@link #postAutoSave()} - so without these overrides too,
+     * whatever the player currently has on their cursor (mid drag-and-drop) would stay parked in the transient
+     * transfer slot through a shutdown save and never make it into the persisted inventory at all.
+     */
+    @Override
+    public void preSave() {
+        preAutoSave();
+    }
+
+    @Override
+    public void postSave() {
+        postAutoSave();
     }
 
     @Override
