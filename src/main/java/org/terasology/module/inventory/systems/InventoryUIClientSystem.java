@@ -5,24 +5,34 @@ package org.terasology.module.inventory.systems;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.core.SimpleUri;
 import org.terasology.engine.entitySystem.entity.EntityRef;
 import org.terasology.engine.entitySystem.event.EventPriority;
 import org.terasology.engine.entitySystem.event.Priority;
 import org.terasology.engine.entitySystem.systems.BaseComponentSystem;
 import org.terasology.engine.entitySystem.systems.RegisterMode;
 import org.terasology.engine.entitySystem.systems.RegisterSystem;
+import org.terasology.engine.input.InputSystem;
 import org.terasology.engine.logic.characters.CharacterComponent;
 import org.terasology.engine.logic.characters.interactions.InteractionUtil;
 import org.terasology.engine.logic.players.LocalPlayer;
+import org.terasology.engine.logic.players.event.LocalPlayerInitializedEvent;
 import org.terasology.engine.network.ClientComponent;
 import org.terasology.engine.registry.In;
 import org.terasology.engine.rendering.nui.NUIManager;
+import org.terasology.engine.unicode.EnclosedAlphanumerics;
 import org.terasology.gestalt.assets.ResourceUrn;
 import org.terasology.gestalt.entitysystem.event.ReceiveEvent;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
 import org.terasology.module.inventory.components.InventoryComponent;
 import org.terasology.module.inventory.input.InventoryButton;
+import org.terasology.notifications.events.ExpireNotificationEvent;
+import org.terasology.notifications.events.ShowNotificationEvent;
+import org.terasology.notifications.model.Notification;
+import org.terasology.nui.Color;
 import org.terasology.nui.ControlWidget;
+import org.terasology.nui.FontColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +41,8 @@ import java.util.stream.IntStream;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class InventoryUIClientSystem extends BaseComponentSystem {
+
+    private static final String EMPTY_POCKETS_NOTIFICATION_ID = "Inventory:emptyPockets";
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryUIClientSystem.class);
 
@@ -45,6 +57,9 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
     private InventoryManager inventoryManager;
 
     @In
+    private InputSystem inputSystem;
+
+    @In
     private LocalPlayer localPlayer;
 
     @Override
@@ -53,9 +68,18 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         nuiManager.addOverlay("Inventory:transferItemCursor", ControlWidget.class);
     }
 
+    @ReceiveEvent
+    public void onLocalPlayerInitialized(LocalPlayerInitializedEvent event, EntityRef entity) {
+        InventoryComponent inventoryComponent = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class);
+        if (inventoryComponent != null && inventoryComponent.itemSlots.stream().allMatch(item -> item == EntityRef.NULL)) {
+            showEmptyPocketsNotification();
+        }
+    }
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
+            localPlayer.getClientEntity().send(new ExpireNotificationEvent(EMPTY_POCKETS_NOTIFICATION_ID));
             nuiManager.toggleScreen("Inventory:inventoryScreen");
             event.consume();
         }
@@ -181,5 +205,45 @@ public class InventoryUIClientSystem extends BaseComponentSystem {
         }
 
         movingItemItem = EntityRef.NULL;
+    }
+
+    /**
+     * Get a formatted representation of the primary {@link Input} associated with the given button binding.
+     * <p>
+     * If the display name of the primary bound key is a single character this representation will be the encircled
+     * character. Otherwise the full display name is used. The bound key will be printed in yellow.
+     * <p>
+     * If no key binding was found the text "n/a" in red color is returned.
+     *
+     * @param button the URI of a bindable button
+     * @return a formatted text to be used as representation for the player
+     */
+    //TODO: put this in a common place? Duplicated in Dialogs and InGameHelp
+    private String getActivationKey(SimpleUri button) {
+        return inputSystem.getInputsForBindButton(button).stream()
+                .findFirst()
+                .map(Input::getDisplayName)
+                .map(key -> {
+                    char c = key.charAt(0);
+                    if (key.length() == 1 && c >= 'A' && c <= 'Z') {
+                        // print the key in yellow within a circle
+                        char code = (char) (EnclosedAlphanumerics.CIRCLED_LATIN_CAPITAL_LETTER_A + (c - 'A'));
+                        return String.valueOf(code);
+                    } else {
+                        return key;
+                    }
+                })
+                .map(key -> FontColor.getColored(key, Color.yellow))
+                .orElse(FontColor.getColored("n/a", Color.red));
+    }
+
+    private void showEmptyPocketsNotification() {
+        Notification notification =
+                new Notification(EMPTY_POCKETS_NOTIFICATION_ID,
+                        "Empty Pockets",
+                        "Press " + getActivationKey(new SimpleUri("Inventory:inventory")) + " to open " +
+                                "your inventory",
+                        "CoreAssets:ChestFront");
+        localPlayer.getClientEntity().send(new ShowNotificationEvent(notification));
     }
 }
