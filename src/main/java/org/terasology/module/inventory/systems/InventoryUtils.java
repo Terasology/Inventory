@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class InventoryUtils {
     private InventoryUtils() {
@@ -51,6 +52,14 @@ public final class InventoryUtils {
             return 0;
         }
         return inventory.itemSlots.size();
+    }
+
+    /**
+     * @param inventory the inventory to inspect
+     * @return every item slot in this inventory that currently holds an item
+     */
+    public static List<EntityRef> filledSlots(InventoryComponent inventory) {
+        return inventory.itemSlots.stream().filter(EntityRef::exists).collect(Collectors.toList());
     }
 
     public static EntityRef getItemAt(EntityRef entity, int slot) {
